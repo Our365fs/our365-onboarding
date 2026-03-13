@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | Our 365 Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0B1F3F;--navy-light:#132D54;--gold:#C8982E;--gold-light:#F5EDD6;
+  --slate:#3E4C5E;--bg:#F4F5F7;--white:#FFFFFF;--border:#DDE1E8;
+  --text:#1A1A2E;--text-secondary:#5A6275;--success:#16A34A;--success-bg:#DCFCE7;
+  --error:#DC2626;--error-bg:#FEE2E2;--warning:#D97706;--warning-bg:#FEF3C7;
+  --info:#2563EB;--info-bg:#DBEAFE;
+  --shadow:0 1px 3px rgba(11,31,63,0.06);--shadow-md:0 4px 12px rgba(11,31,63,0.08);
+  --shadow-lg:0 8px 30px rgba(11,31,63,0.12);--radius:10px;
+  --font-body:'DM Sans',system-ui,sans-serif;--font-display:'Playfair Display',Georgia,serif;
+}
+html{font-size:16px}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ─── HEADER ─── */
+.header{background:var(--navy);border-bottom:3px solid var(--gold);position:sticky;top:0;z-index:100}
+.header-inner{max-width:1200px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:38px;height:38px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--navy)}
+.brand h1{font-family:var(--font-display);font-size:1.05rem;color:var(--white);font-weight:700}
+.brand span{font-size:0.68rem;color:var(--gold);letter-spacing:0.06em;text-transform:uppercase;font-weight:500}
+.header-right{display:flex;align-items:center;gap:14px}
+.admin-badge{background:rgba(200,152,46,0.15);border:1px solid rgba(200,152,46,0.3);color:var(--gold);font-size:0.7rem;font-weight:600;padding:5px 14px;border-radius:20px}
+.btn-logout{background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);font-family:var(--font-body);font-size:0.75rem;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all 0.2s}
+.btn-logout:hover{background:rgba(255,255,255,0.1);color:var(--white)}
+
+/* ─── LOGIN ─── */
+.login-overlay{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:999}
+.login-overlay.hidden{display:none}
+.login-box{background:var(--white);border-radius:16px;padding:40px;width:400px;max-width:90vw;box-shadow:var(--shadow-lg);text-align:center}
+.login-box .brand-icon{margin:0 auto 16px;width:52px;height:52px;font-size:22px}
+.login-box h2{font-family:var(--font-display);font-size:1.3rem;color:var(--navy);margin-bottom:4px}
+.login-box p{font-size:0.82rem;color:var(--text-secondary);margin-bottom:24px}
+.login-box input{width:100%;font-family:var(--font-body);font-size:0.9rem;padding:11px 16px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:12px;outline:none;transition:border 0.2s}
+.login-box input:focus{border-color:var(--gold)}
+.login-box .btn{width:100%;padding:12px;font-size:0.9rem;font-weight:600;border:none;border-radius:8px;cursor:pointer;font-family:var(--font-body);background:var(--gold);color:var(--white);transition:background 0.2s}
+.login-box .btn:hover{background:#B8891F}
+.login-error{color:var(--error);font-size:0.8rem;margin-bottom:10px;display:none}
+
+/* ─── LAYOUT ─── */
+.container{max-width:1200px;margin:0 auto;padding:24px}
+
+/* ─── STATS ROW ─── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{background:var(--white);border-radius:var(--radius);padding:20px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.stat-card .stat-label{font-size:0.72rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+.stat-card .stat-value{font-family:var(--font-display);font-size:1.75rem;color:var(--navy);font-weight:700}
+.stat-card .stat-sub{font-size:0.72rem;color:var(--text-secondary);margin-top:4px}
+.stat-card.gold{border-left:4px solid var(--gold)}
+.stat-card.green{border-left:4px solid var(--success)}
+.stat-card.blue{border-left:4px solid var(--info)}
+.stat-card.orange{border-left:4px solid var(--warning)}
+
+/* ─── TOOLBAR ─── */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.toolbar h2{font-family:var(--font-display);font-size:1.2rem;color:var(--navy)}
+.toolbar-right{display:flex;gap:10px;align-items:center}
+.search-box{font-family:var(--font-body);font-size:0.85rem;padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;width:240px;outline:none;background:var(--white);transition:border 0.2s}
+.search-box:focus{border-color:var(--gold)}
+.filter-select{font-family:var(--font-body);font-size:0.82rem;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--text);cursor:pointer;outline:none}
+.btn-export{font-family:var(--font-body);font-size:0.78rem;font-weight:600;padding:8px 16px;border:1.5px solid var(--border);border-radius:8px;background:var(--white);color:var(--slate);cursor:pointer;transition:all 0.2s}
+.btn-export:hover{background:var(--bg);border-color:var(--slate)}
+
+/* ─── TABLE ─── */
+.table-wrapper{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--navy)}
+th{font-size:0.72rem;font-weight:600;color:var(--white);text-align:left;padding:12px 16px;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap}
+td{font-size:0.84rem;padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover{background:rgba(200,152,46,0.03)}
+.name-cell{font-weight:600;color:var(--navy)}
+.email-cell{color:var(--text-secondary);font-size:0.8rem}
+.date-cell{font-size:0.8rem;color:var(--text-secondary);white-space:nowrap}
+
+/* Status badges */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:0.7rem;font-weight:600;letter-spacing:0.02em}
+.badge-pending{background:var(--warning-bg);color:var(--warning)}
+.badge-review{background:var(--info-bg);color:var(--info)}
+.badge-approved{background:var(--success-bg);color:var(--success)}
+.badge-rejected{background:var(--error-bg);color:var(--error)}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+
+/* Action buttons */
+.action-btn{background:none;border:1.5px solid var(--border);border-radius:6px;padding:5px 10px;font-family:var(--font-body);font-size:0.72rem;font-weight:600;cursor:pointer;color:var(--slate);transition:all 0.2s;white-space:nowrap}
+.action-btn:hover{background:var(--bg);border-color:var(--slate)}
+.action-btn.primary{border-color:var(--gold);color:var(--gold)}
+.action-btn.primary:hover{background:var(--gold-light)}
+
+/* ─── DETAIL PANEL (SLIDE-OVER) ─── */
+.overlay{position:fixed;inset:0;background:rgba(11,31,63,0.4);z-index:200;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.overlay.open{opacity:1;pointer-events:all}
+.detail-panel{position:fixed;top:0;right:-540px;width:520px;max-width:95vw;height:100vh;background:var(--white);z-index:210;box-shadow:-8px 0 30px rgba(11,31,63,0.15);transition:right 0.35s ease;overflow-y:auto}
+.detail-panel.open{right:0}
+.dp-header{background:var(--navy);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5}
+.dp-header h3{font-family:var(--font-display);font-size:1.1rem;color:var(--white)}
+.dp-close{background:none;border:none;color:rgba(255,255,255,0.6);font-size:1.4rem;cursor:pointer;padding:4px 8px;line-height:1;transition:color 0.2s}
+.dp-close:hover{color:var(--white)}
+.dp-body{padding:24px}
+.dp-section{margin-bottom:24px}
+.dp-section h4{font-size:0.78rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--gold-light)}
+.dp-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bg)}
+.dp-row:last-child{border-bottom:none}
+.dp-label{font-size:0.8rem;color:var(--text-secondary);font-weight:500}
+.dp-value{font-size:0.84rem;color:var(--text);font-weight:600;text-align:right;max-width:55%;word-break:break-word}
+
+/* Document cards */
+.doc-card{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:8px;margin-bottom:8px;border:1px solid var(--border)}
+.doc-icon{font-size:1.5rem;flex-shrink:0}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-size:0.82rem;font-weight:600;color:var(--navy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-size{font-size:0.7rem;color:var(--text-secondary)}
+.doc-download{background:var(--navy);color:var(--white);border:none;border-radius:6px;padding:6px 12px;font-family:var(--font-body);font-size:0.72rem;font-weight:600;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+.doc-download:hover{background:var(--navy-light)}
+
+/* Signature display */
+.sig-display{border:1.5px solid var(--border);border-radius:8px;padding:8px;background:var(--bg)}
+.sig-display img{width:100%;height:auto;max-height:100px;object-fit:contain}
+
+/* Status selector in detail */
+.status-selector{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.status-btn{padding:8px 18px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);font-family:var(--font-body);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s}
+.status-btn:hover{background:var(--bg)}
+.status-btn.active-pending{background:var(--warning-bg);border-color:var(--warning);color:var(--warning)}
+.status-btn.active-review{background:var(--info-bg);border-color:var(--info);color:var(--info)}
+.status-btn.active-approved{background:var(--success-bg);border-color:var(--success);color:var(--success)}
+.status-btn.active-rejected{background:var(--error-bg);border-color:var(--error);color:var(--error)}
+
+/* Notes */
+.dp-notes{width:100%;font-family:var(--font-body);font-size:0.85rem;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;resize:vertical;min-height:80px;outline:none;transition:border 0.2s}
+.dp-notes:focus{border-color:var(--gold)}
+.btn-save-notes{margin-top:8px;padding:8px 20px;background:var(--gold);color:var(--white);border:none;border-radius:8px;font-family:var(--font-body);font-size:0.82rem;font-weight:600;cursor:pointer;transition:background 0.2s}
+.btn-save-notes:hover{background:#B8891F}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 24px;color:var(--text-secondary)}
+.empty-state .empty-icon{font-size:3rem;margin-bottom:12px;opacity:0.4}
+.empty-state h3{font-family:var(--font-display);font-size:1.1rem;color:var(--navy);margin-bottom:6px}
+.empty-state p{font-size:0.85rem}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:1fr}
+  .toolbar{flex-direction:column;align-items:flex-start}
+  .toolbar-right{width:100%;flex-wrap:wrap}
+  .search-box{width:100%}
+  .detail-panel{width:100%}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ LOGIN OVERLAY ═══════════ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="brand-icon">365</div>
+    <h2>Admin Login</h2>
+    <p>Broker Onboarding Dashboard</p>
+    <div class="login-error" id="loginError">Invalid credentials. Please try again.</div>
+    <input type="text" id="loginUser" placeholder="Username" autofocus>
+    <input type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn" onclick="doLogin()">Sign In</button>
+    <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:16px">Default: admin / Our365Admin</p>
+  </div>
+</div>
+
+<!-- ═══════════ HEADER ═══════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">365</div>
+      <div>
+        <h1>Our 365 Financial Solution</h1>
+        <span>Onboarding Admin Dashboard</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="admin-badge">Emmanuelle Cador</div>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════ MAIN ═══════════ -->
+<div class="container" id="mainContainer">
+
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card gold"><div class="stat-label">Total Submissions</div><div class="stat-value" id="statTotal">0</div><div class="stat-sub">All time</div></div>
+    <div class="stat-card orange"><div class="stat-label">Pending Review</div><div class="stat-value" id="statPending">0</div><div class="stat-sub">Awaiting action</div></div>
+    <div class="stat-card blue"><div class="stat-label">In Review</div><div class="stat-value" id="statReview">0</div><div class="stat-sub">Being processed</div></div>
+    <div class="stat-card green"><div class="stat-label">Approved</div><div class="stat-value" id="statApproved">0</div><div class="stat-sub">Ready for contracting</div></div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <h2>Onboarding Submissions</h2>
+    <div class="toolbar-right">
+      <input type="text" class="search-box" id="searchBox" placeholder="Search by name or email..." oninput="renderTable()">
+      <select class="filter-select" id="filterStatus" onchange="renderTable()">
+        <option value="all">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="review">In Review</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <button class="btn-export" onclick="exportCSV()">⬇ Export CSV</button>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Agent #</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>License #</th>
+          <th>Submitted</th>
+          <th>Status</th>
+          <th>Docs</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">📋</div>
+      <h3>No submissions yet</h3>
+      <p>When a broker completes the onboarding form, their submission will appear here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ DETAIL SLIDE-OVER ═══════════ -->
+<div class="overlay" id="overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detailPanel">
+  <div class="dp-header">
+    <h3 id="dpTitle">Broker Details</h3>
+    <button class="dp-close" onclick="closeDetail()">&times;</button>
+  </div>
+  <div class="dp-body" id="dpBody"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATABASE (IndexedDB)
+// ═══════════════════════════════════════════════
+const DB_NAME = 'Our365Onboarding';
+const DB_VERSION = 1;
+const STORE = 'submissions';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        const store = db.createObjectStore(STORE, { keyPath: 'id' });
+        store.createIndex('status', 'status', { unique: false });
+        store.createIndex('submittedAt', 'submittedAt', { unique: false });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function getAllSubmissions() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const store = tx.objectStore(STORE);
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)));
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function getSubmission(id) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const req = tx.objectStore(STORE).get(id);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function updateSubmission(data) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(data);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+// ═══════════════════════════════════════════════
+// AUTH (simple — replace with real auth in production)
+// ═══════════════════════════════════════════════
+const CREDS = { username: 'admin', password: 'Our365Admin' };
+let isLoggedIn = sessionStorage.getItem('ob_admin') === 'true';
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if (u === CREDS.username && p === CREDS.password) {
+    sessionStorage.setItem('ob_admin', 'true');
+    isLoggedIn = true;
+    document.getElementById('loginOverlay').classList.add('hidden');
+    loadDashboard();
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('ob_admin');
+  isLoggedIn = false;
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginError').style.display = 'none';
+}
+
+if (isLoggedIn) {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  loadDashboard();
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════
+let submissions = [];
+
+async function loadDashboard() {
+  submissions = await getAllSubmissions();
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = submissions.length;
+  document.getElementById('statPending').textContent = submissions.filter(s => s.status === 'pending').length;
+  document.getElementById('statReview').textContent = submissions.filter(s => s.status === 'review').length;
+  document.getElementById('statApproved').textContent = submissions.filter(s => s.status === 'approved').length;
+}
+
+function renderTable() {
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const statusFilter = document.getElementById('filterStatus').value;
+
+  let filtered = submissions;
+  if (statusFilter !== 'all') filtered = filtered.filter(s => s.status === statusFilter);
+  if (search) filtered = filtered.filter(s =>
+    (s.firstName + ' ' + s.lastName).toLowerCase().includes(search) ||
+    (s.email || '').toLowerCase().includes(search)
+  );
+
+  const tbody = document.getElementById('tableBody');
+  const empty = document.getElementById('emptyState');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(s => {
+    const name = `${s.firstName} ${s.lastName}`;
+    const docCount = s.documents ? Object.keys(s.documents).length : 0;
+    const date = new Date(s.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const badgeClass = { pending: 'badge-pending', review: 'badge-review', approved: 'badge-approved', rejected: 'badge-rejected' }[s.status] || 'badge-pending';
+    const badgeLabel = { pending: 'Pending', review: 'In Review', approved: 'Approved', rejected: 'Rejected' }[s.status] || 'Pending';
+
+    return `<tr>
+      <td style="font-weight:700;color:var(--gold);white-space:nowrap">${esc(s.agentNumber || '—')}</td>
+      <td class="name-cell">${esc(name)}</td>
+      <td class="email-cell">${esc(s.email || '—')}</td>
+      <td>${esc(s.licenseNumber || '—')}</td>
+      <td class="date-cell">${date}</td>
+      <td><span class="badge ${badgeClass}">${badgeLabel}</span></td>
+      <td>${docCount}/4</td>
+      <td><button class="action-btn primary" onclick="openDetail('${s.id}')">View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// ═══════════════════════════════════════════════
+// DETAIL PANEL
+// ═══════════════════════════════════════════════
+async function openDetail(id) {
+  const s = await getSubmission(id);
+  if (!s) return;
+
+  document.getElementById('dpTitle').textContent = `${s.firstName} ${s.lastName}`;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('detailPanel').classList.add('open');
+
+  const docs = s.documents || {};
+  const docLabels = { photoId: 'Photo ID', license: 'Insurance License', eo: 'E&O Certificate', w9: 'W-9 Form' };
+  const docIcons = { photoId: '🪪', license: '📄', eo: '🛡️', w9: '📋' };
+
+  let docsHtml = '';
+  for (const [key, file] of Object.entries(docs)) {
+    const sizeKB = file.size ? (file.size / 1024).toFixed(0) : '?';
+    docsHtml += `
+      <div class="doc-card">
+        <div class="doc-icon">${docIcons[key] || '📎'}</div>
+        <div class="doc-info">
+          <div class="doc-name">${esc(file.name)}</div>
+          <div class="doc-size">${sizeKB} KB &bull; ${docLabels[key] || key}</div>
+        </div>
+        <button class="doc-download" onclick="downloadDoc('${id}','${key}')">Download</button>
+      </div>`;
+  }
+  if (!docsHtml) docsHtml = '<p style="color:var(--text-secondary);font-size:0.85rem">No documents uploaded.</p>';
+
+  const sigHtml = s.signatureData
+    ? `<div class="sig-display"><img src="${s.signatureData}" alt="Signature"></div>`
+    : '<p style="color:var(--text-secondary);font-size:0.85rem">No signature captured.</p>';
+
+  const lines = [];
+  if (s.lineLife) lines.push('Life');
+  if (s.lineHealth) lines.push('Health');
+  if (s.lineAnnuity) lines.push('Annuities');
+  if (s.lineMedicare) lines.push('Medicare');
+
+  const statusBtns = ['pending', 'review', 'approved', 'rejected'].map(st => {
+    const labels = { pending: 'Pending', review: 'In Review', approved: 'Approved', rejected: 'Rejected' };
+    const cls = s.status === st ? `active-${st}` : '';
+    return `<button class="status-btn ${cls}" onclick="setStatus('${id}','${st}')">${labels[st]}</button>`;
+  }).join('');
+
+  document.getElementById('dpBody').innerHTML = `
+    <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--gold-light);border:1px solid var(--gold);border-radius:8px;margin-bottom:20px">
+      <div style="font-size:0.68rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.05em">Agent #</div>
+      <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;color:var(--navy)">${esc(s.agentNumber || 'Not assigned')}</div>
+    </div>
+
+    <div class="dp-section">
+      <h4>Personal Information</h4>
+      <div class="dp-row"><span class="dp-label">Full Name</span><span class="dp-value">${esc(s.firstName)} ${esc(s.lastName)}</span></div>
+      <div class="dp-row"><span class="dp-label">Email</span><span class="dp-value">${esc(s.email || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Phone</span><span class="dp-value">${esc(s.phone || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Address</span><span class="dp-value">${esc(s.address || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Date of Birth</span><span class="dp-value">${esc(s.dob || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">SSN</span><span class="dp-value">•••-••-${(s.ssn || '').slice(-4) || '••••'}</span></div>
+      <div class="dp-row"><span class="dp-label">Referring Broker</span><span class="dp-value">${esc(s.referringBroker || 'None')}</span></div>
+    </div>
+
+    <div class="dp-section">
+      <h4>Licensing</h4>
+      <div class="dp-row"><span class="dp-label">License #</span><span class="dp-value">${esc(s.licenseNumber || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">License Type</span><span class="dp-value">${esc(s.licenseType || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Expiration</span><span class="dp-value">${esc(s.licenseExpiry || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">NPN</span><span class="dp-value">${esc(s.npn || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Lines of Authority</span><span class="dp-value">${lines.length ? lines.join(', ') : '—'}</span></div>
+      <div class="dp-row"><span class="dp-label">Experience</span><span class="dp-value">${esc(s.experience || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Regulatory Action</span><span class="dp-value">${s.regulatoryAction === 'yes' ? '⚠️ Yes' : 'No'}</span></div>
+      ${s.regulatoryExplain ? `<div class="dp-row"><span class="dp-label">Explanation</span><span class="dp-value">${esc(s.regulatoryExplain)}</span></div>` : ''}
+    </div>
+
+    <div class="dp-section">
+      <h4>Banking (Direct Deposit)</h4>
+      <div class="dp-row"><span class="dp-label">Account Holder</span><span class="dp-value">${esc(s.accountName || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Bank</span><span class="dp-value">${esc(s.bankName || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Account Type</span><span class="dp-value">${esc(s.accountType || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Routing #</span><span class="dp-value">${esc(s.routingNumber || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Account #</span><span class="dp-value">••••${(s.accountNumber || '').slice(-4) || '••••'}</span></div>
+    </div>
+
+    <div class="dp-section">
+      <h4>Uploaded Documents</h4>
+      ${docsHtml}
+    </div>
+
+    <div class="dp-section">
+      <h4>E-Signature</h4>
+      ${sigHtml}
+      <div class="dp-row" style="margin-top:8px"><span class="dp-label">Typed Name</span><span class="dp-value">${esc(s.signedName || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Signed Date</span><span class="dp-value">${esc(s.signDate || '—')}</span></div>
+    </div>
+
+    <div class="dp-section">
+      <h4>Update Status</h4>
+      <div class="status-selector">${statusBtns}</div>
+    </div>
+
+    <div class="dp-section">
+      <h4>Admin Notes</h4>
+      <textarea class="dp-notes" id="adminNotes" placeholder="Add notes about this broker (e.g., contracting status, follow-up needed)...">${esc(s.adminNotes || '')}</textarea>
+      <button class="btn-save-notes" onclick="saveNotes('${id}')">Save Notes</button>
+    </div>
+
+    <div class="dp-section">
+      <h4>Submission Info</h4>
+      <div class="dp-row"><span class="dp-label">Confirmation #</span><span class="dp-value">${esc(s.confirmationNumber || '—')}</span></div>
+      <div class="dp-row"><span class="dp-label">Submitted</span><span class="dp-value">${new Date(s.submittedAt).toLocaleString('en-US')}</span></div>
+    </div>
+  `;
+}
+
+function closeDetail() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('detailPanel').classList.remove('open');
+}
+
+async function setStatus(id, status) {
+  const s = await getSubmission(id);
+  if (!s) return;
+  s.status = status;
+  await updateSubmission(s);
+  submissions = await getAllSubmissions();
+  updateStats();
+  renderTable();
+  openDetail(id); // refresh panel
+}
+
+async function saveNotes(id) {
+  const s = await getSubmission(id);
+  if (!s) return;
+  s.adminNotes = document.getElementById('adminNotes').value;
+  await updateSubmission(s);
+  showToast('Notes saved');
+}
+
+function downloadDoc(id, key) {
+  getSubmission(id).then(s => {
+    if (!s || !s.documents || !s.documents[key]) return;
+    const file = s.documents[key];
+    const a = document.createElement('a');
+    a.href = file.dataUrl;
+    a.download = file.name;
+    a.click();
+  });
+}
+
+// ═══════════════════════════════════════════════
+// EXPORT CSV
+// ═══════════════════════════════════════════════
+function exportCSV() {
+  if (!submissions.length) return;
+  const headers = ['Agent #','Name','Email','Phone','License #','License Type','NPN','Experience','Referring Broker','Status','Submitted'];
+  const rows = submissions.map(s => [
+    s.agentNumber||'',`${s.firstName} ${s.lastName}`,s.email,s.phone,s.licenseNumber,s.licenseType,s.npn,s.experience,s.referringBroker||'',s.status,
+    new Date(s.submittedAt).toLocaleDateString()
+  ]);
+  const csv = [headers,...rows].map(r => r.map(c => `"${(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `onboarding_submissions_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;font-size:0.85rem;font-weight:600;background:var(--navy);color:var(--white);z-index:9999;box-shadow:var(--shadow-lg);font-family:var(--font-body)';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// Load on start
+if (isLoggedIn) loadDashboard();
+</script>
+</body>
+</html>

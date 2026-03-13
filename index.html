@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Broker Onboarding | Our 365 Financial Solution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0B1F3F;--navy-light:#132D54;--gold:#C8982E;--gold-light:#F5EDD6;
+  --slate:#3E4C5E;--bg:#F7F8FA;--white:#FFFFFF;--border:#DDE1E8;
+  --text:#1A1A2E;--text-secondary:#5A6275;--success:#16A34A;--success-bg:#DCFCE7;
+  --error:#DC2626;--error-bg:#FEE2E2;--shadow:0 1px 3px rgba(11,31,63,0.08);
+  --shadow-lg:0 8px 30px rgba(11,31,63,0.12);--radius:10px;
+  --font-body:'DM Sans',system-ui,sans-serif;--font-display:'Playfair Display',Georgia,serif;
+  --step-active:var(--gold);--step-done:var(--success);--step-pending:var(--border);
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--text);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ─── HEADER ─── */
+.site-header{background:var(--navy);padding:0;position:sticky;top:0;z-index:100;border-bottom:3px solid var(--gold)}
+.header-inner{max-width:960px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-icon{width:42px;height:42px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:20px;font-weight:700;color:var(--navy)}
+.brand-text h1{font-family:var(--font-display);font-size:1.15rem;color:var(--white);font-weight:700;line-height:1.2}
+.brand-text span{font-size:0.72rem;color:var(--gold);letter-spacing:0.06em;text-transform:uppercase;font-weight:500}
+.header-badge{background:rgba(200,152,46,0.15);border:1px solid rgba(200,152,46,0.3);color:var(--gold);font-size:0.7rem;font-weight:600;padding:5px 14px;border-radius:20px;letter-spacing:0.04em}
+
+/* ─── STEPPER ─── */
+.stepper-bar{background:var(--white);border-bottom:1px solid var(--border);padding:18px 24px;position:sticky;top:73px;z-index:90}
+.stepper{max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:0;position:relative}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;position:relative;z-index:2;cursor:pointer}
+.step-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;border:2.5px solid var(--step-pending);color:var(--text-secondary);background:var(--white);transition:all 0.35s ease}
+.step-item.active .step-circle{border-color:var(--gold);background:var(--gold);color:var(--white);box-shadow:0 0 0 4px rgba(200,152,46,0.18)}
+.step-item.done .step-circle{border-color:var(--success);background:var(--success);color:var(--white)}
+.step-label{font-size:0.68rem;font-weight:600;color:var(--text-secondary);text-align:center;letter-spacing:0.02em;transition:color 0.3s}
+.step-item.active .step-label{color:var(--gold)}
+.step-item.done .step-label{color:var(--success)}
+.step-line{position:absolute;top:18px;left:0;right:0;height:2.5px;background:var(--border);z-index:1}
+.step-line-fill{height:100%;background:var(--success);transition:width 0.5s ease;width:0%}
+
+/* ─── MAIN CONTAINER ─── */
+.main{max-width:720px;margin:32px auto;padding:0 24px 80px}
+.step-panel{display:none;animation:fadeUp 0.4s ease}
+.step-panel.visible{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── CARDS ─── */
+.card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:32px;margin-bottom:24px;box-shadow:var(--shadow)}
+.card-title{font-family:var(--font-display);font-size:1.35rem;color:var(--navy);margin-bottom:6px}
+.card-subtitle{font-size:0.85rem;color:var(--text-secondary);margin-bottom:24px;line-height:1.5}
+
+/* ─── FORM ELEMENTS ─── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.form-grid .full{grid-column:1/-1}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:0.78rem;font-weight:600;color:var(--slate)}
+.form-group label .req{color:var(--error);margin-left:2px}
+.form-group input,.form-group select,.form-group textarea{
+  font-family:var(--font-body);font-size:0.9rem;padding:10px 14px;border:1.5px solid var(--border);
+  border-radius:8px;background:var(--bg);color:var(--text);outline:none;transition:border 0.2s,box-shadow 0.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,152,46,0.12)}
+.form-group textarea{resize:vertical;min-height:80px}
+.form-group input.error{border-color:var(--error);box-shadow:0 0 0 3px rgba(220,38,38,0.1)}
+.form-hint{font-size:0.72rem;color:var(--text-secondary);margin-top:2px}
+
+/* ─── UPLOAD AREA ─── */
+.upload-zone{border:2px dashed var(--border);border-radius:var(--radius);padding:28px;text-align:center;cursor:pointer;transition:all 0.3s;background:var(--bg);position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--gold);background:var(--gold-light)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-icon{font-size:2rem;margin-bottom:6px}
+.upload-label{font-size:0.85rem;font-weight:600;color:var(--navy)}
+.upload-sublabel{font-size:0.75rem;color:var(--text-secondary);margin-top:4px}
+.uploaded-file{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--success-bg);border-radius:8px;margin-top:10px;font-size:0.82rem;color:var(--success)}
+.uploaded-file .remove-btn{margin-left:auto;background:none;border:none;color:var(--error);cursor:pointer;font-size:0.8rem;font-weight:600}
+
+/* ─── SIGNATURE PAD ─── */
+.sig-container{border:1.5px solid var(--border);border-radius:8px;background:var(--white);overflow:hidden;position:relative}
+.sig-container canvas{display:block;width:100%;cursor:crosshair;touch-action:none}
+.sig-clear{position:absolute;top:8px;right:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 12px;font-size:0.72rem;font-weight:600;cursor:pointer;color:var(--slate);transition:background 0.2s}
+.sig-clear:hover{background:var(--border)}
+.sig-line{position:absolute;bottom:32px;left:24px;right:24px;height:1px;background:var(--border);pointer-events:none}
+.sig-label{position:absolute;bottom:10px;left:24px;font-size:0.68rem;color:var(--text-secondary);pointer-events:none}
+
+/* ─── E-SIGN SECTION ─── */
+.acknowledgment-text{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:20px;max-height:280px;overflow-y:auto;font-size:0.82rem;line-height:1.65;color:var(--text);margin-bottom:20px}
+.acknowledgment-text h4{font-family:var(--font-display);color:var(--navy);margin:12px 0 6px;font-size:1rem}
+.acknowledgment-text ul{padding-left:20px;margin:8px 0}
+.acknowledgment-text li{margin-bottom:4px}
+.checkbox-row{display:flex;align-items:flex-start;gap:10px;margin:16px 0}
+.checkbox-row input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold);margin-top:2px;flex-shrink:0}
+.checkbox-row span{font-size:0.85rem;line-height:1.5}
+
+/* ─── BUTTONS ─── */
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:12px}
+.btn{font-family:var(--font-body);font-size:0.88rem;font-weight:600;padding:12px 28px;border-radius:8px;border:none;cursor:pointer;transition:all 0.25s;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:var(--gold);color:var(--white);box-shadow:0 2px 8px rgba(200,152,46,0.25)}
+.btn-primary:hover{background:#B8891F;transform:translateY(-1px);box-shadow:0 4px 14px rgba(200,152,46,0.3)}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.btn-secondary{background:var(--white);color:var(--slate);border:1.5px solid var(--border)}
+.btn-secondary:hover{background:var(--bg);border-color:var(--slate)}
+.btn-success{background:var(--success);color:var(--white);box-shadow:0 2px 8px rgba(22,163,74,0.25);font-size:1rem;padding:14px 36px}
+.btn-success:hover{background:#15803D}
+
+/* ─── SUCCESS PANEL ─── */
+.success-panel{text-align:center;padding:48px 24px}
+.success-icon{width:80px;height:80px;background:var(--success-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2.5rem}
+.success-panel h2{font-family:var(--font-display);font-size:1.5rem;color:var(--navy);margin-bottom:8px}
+.success-panel p{color:var(--text-secondary);font-size:0.9rem;max-width:440px;margin:0 auto;line-height:1.6}
+.success-detail{background:var(--bg);border-radius:8px;padding:20px;margin-top:24px;text-align:left;max-width:440px;margin-left:auto;margin-right:auto}
+.success-detail dt{font-size:0.72rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;margin-top:12px}
+.success-detail dt:first-child{margin-top:0}
+.success-detail dd{font-size:0.88rem;color:var(--text);margin-top:2px}
+
+/* ─── PROGRESS INDICATOR ─── */
+.section-progress{display:flex;gap:6px;margin-bottom:20px}
+.section-dot{width:100%;height:4px;border-radius:2px;background:var(--border);transition:background 0.3s}
+.section-dot.filled{background:var(--gold)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:640px){
+  .form-grid{grid-template-columns:1fr}
+  .header-inner{padding:12px 16px}
+  .brand-text h1{font-size:1rem}
+  .header-badge{display:none}
+  .main{padding:0 16px 80px}
+  .card{padding:20px}
+  .stepper-bar{padding:12px 16px}
+  .step-label{font-size:0.6rem}
+  .step-circle{width:30px;height:30px;font-size:0.7rem}
+  .btn-row{flex-direction:column}
+  .btn{width:100%;justify-content:center}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">365</div>
+      <div class="brand-text">
+        <h1>Our 365 Financial Solution</h1>
+        <span>Broker Onboarding Portal</span>
+      </div>
+    </div>
+    <div class="header-badge">Life &bull; Health &bull; Annuities</div>
+  </div>
+</header>
+
+<!-- STEPPER -->
+<div class="stepper-bar">
+  <div class="stepper">
+    <div class="step-line"><div class="step-line-fill" id="stepLineFill"></div></div>
+    <div class="step-item active" data-step="1" onclick="goToStep(1)">
+      <div class="step-circle">1</div>
+      <div class="step-label">Application</div>
+    </div>
+    <div class="step-item" data-step="2" onclick="goToStep(2)">
+      <div class="step-circle">2</div>
+      <div class="step-label">Documents</div>
+    </div>
+    <div class="step-item" data-step="3" onclick="goToStep(3)">
+      <div class="step-circle">3</div>
+      <div class="step-label">Direct Deposit</div>
+    </div>
+    <div class="step-item" data-step="4" onclick="goToStep(4)">
+      <div class="step-circle">4</div>
+      <div class="step-label">E-Sign</div>
+    </div>
+    <div class="step-item" data-step="5">
+      <div class="step-circle">5</div>
+      <div class="step-label">Complete</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- ═══════════ STEP 1: APPLICATION ═══════════ -->
+<div class="step-panel visible" id="step1">
+  <div class="card">
+    <h2 class="card-title">Agent / Broker Application</h2>
+    <p class="card-subtitle">Complete all fields below. This information will be used for your agency file and carrier contracting.</p>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>First Name <span class="req">*</span></label>
+        <input type="text" id="firstName" required placeholder="First name">
+      </div>
+      <div class="form-group">
+        <label>Last Name <span class="req">*</span></label>
+        <input type="text" id="lastName" required placeholder="Last name">
+      </div>
+      <div class="form-group">
+        <label>Email Address <span class="req">*</span></label>
+        <input type="email" id="email" required placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label>Phone Number <span class="req">*</span></label>
+        <input type="tel" id="phone" required placeholder="(555) 123-4567">
+      </div>
+      <div class="form-group full">
+        <label>Mailing Address <span class="req">*</span></label>
+        <input type="text" id="address" required placeholder="Street address, City, State, ZIP">
+      </div>
+      <div class="form-group">
+        <label>Date of Birth <span class="req">*</span></label>
+        <input type="date" id="dob" required>
+      </div>
+      <div class="form-group">
+        <label>Social Security Number <span class="req">*</span></label>
+        <input type="password" id="ssn" required placeholder="XXX-XX-XXXX" maxlength="11">
+        <span class="form-hint">Encrypted &amp; stored securely. Required for carrier contracting.</span>
+      </div>
+      <div class="form-group">
+        <label>Florida License Number <span class="req">*</span></label>
+        <input type="text" id="licenseNumber" required placeholder="e.g., A012345">
+      </div>
+      <div class="form-group">
+        <label>License Type <span class="req">*</span></label>
+        <select id="licenseType" required>
+          <option value="">Select license type</option>
+          <option value="2-15">2-15 (Life, Health & Variable Annuity)</option>
+          <option value="2-14">2-14 (Life Agent)</option>
+          <option value="2-40">2-40 (Health Agent)</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>License Expiration Date <span class="req">*</span></label>
+        <input type="date" id="licenseExpiry" required>
+      </div>
+      <div class="form-group">
+        <label>NPN (National Producer Number) <span class="req">*</span></label>
+        <input type="text" id="npn" required placeholder="e.g., 12345678">
+      </div>
+      <div class="form-group">
+        <label>Years of Insurance Experience</label>
+        <select id="experience">
+          <option value="">Select</option>
+          <option value="0-1">Less than 1 year</option>
+          <option value="1-3">1–3 years</option>
+          <option value="3-5">3–5 years</option>
+          <option value="5-10">5–10 years</option>
+          <option value="10+">10+ years</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Lines of Authority (check all that apply)</label>
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:6px">
+          <label style="font-weight:400;display:flex;align-items:center;gap:6px;font-size:0.85rem">
+            <input type="checkbox" id="lineLife" value="Life"> Life
+          </label>
+          <label style="font-weight:400;display:flex;align-items:center;gap:6px;font-size:0.85rem">
+            <input type="checkbox" id="lineHealth" value="Health"> Health
+          </label>
+          <label style="font-weight:400;display:flex;align-items:center;gap:6px;font-size:0.85rem">
+            <input type="checkbox" id="lineAnnuity" value="Annuity"> Annuities
+          </label>
+          <label style="font-weight:400;display:flex;align-items:center;gap:6px;font-size:0.85rem">
+            <input type="checkbox" id="lineMedicare" value="Medicare"> Medicare
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Referring Broker (if any)</label>
+        <input type="text" id="referringBroker" placeholder="Name of broker who recruited you">
+      </div>
+      <div class="form-group">
+        <label>Current E&amp;O Carrier</label>
+        <input type="text" id="eoCarrier" placeholder="E&O insurance carrier name">
+      </div>
+      <div class="form-group full">
+        <label>Have you ever had an insurance license revoked, suspended, or been subject to regulatory action?</label>
+        <select id="regulatoryAction" required>
+          <option value="">Select</option>
+          <option value="no">No</option>
+          <option value="yes">Yes (please explain below)</option>
+        </select>
+      </div>
+      <div class="form-group full" id="regulatoryExplainGroup" style="display:none">
+        <label>Please explain</label>
+        <textarea id="regulatoryExplain" placeholder="Provide details..."></textarea>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <div></div>
+      <button class="btn btn-primary" onclick="validateAndNext(1)">Continue to Documents &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ STEP 2: DOCUMENT UPLOADS ═══════════ -->
+<div class="step-panel" id="step2">
+  <div class="card">
+    <h2 class="card-title">Document Uploads</h2>
+    <p class="card-subtitle">Upload the following required documents. Accepted formats: PDF, JPG, PNG (max 10MB each).</p>
+
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <label style="font-size:0.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:8px">
+          Government-Issued Photo ID <span class="req">*</span>
+        </label>
+        <div class="upload-zone" id="zone_photoId">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'photoId')">
+          <div class="upload-icon">🪪</div>
+          <div class="upload-label">Drop your photo ID here or click to browse</div>
+          <div class="upload-sublabel">Driver's license, passport, or state ID</div>
+        </div>
+        <div id="file_photoId"></div>
+      </div>
+
+      <div>
+        <label style="font-size:0.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:8px">
+          Florida Insurance License <span class="req">*</span>
+        </label>
+        <div class="upload-zone" id="zone_license">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'license')">
+          <div class="upload-icon">📄</div>
+          <div class="upload-label">Drop your license copy here or click to browse</div>
+          <div class="upload-sublabel">Active Florida license (2-15 or applicable lines)</div>
+        </div>
+        <div id="file_license"></div>
+      </div>
+
+      <div>
+        <label style="font-size:0.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:8px">
+          E&amp;O Insurance Certificate <span class="req">*</span>
+        </label>
+        <div class="upload-zone" id="zone_eo">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'eo')">
+          <div class="upload-icon">🛡️</div>
+          <div class="upload-label">Drop your E&amp;O certificate here or click to browse</div>
+          <div class="upload-sublabel">Must list Our 365 Financial Solution LLC as additional insured</div>
+        </div>
+        <div id="file_eo"></div>
+      </div>
+
+      <div>
+        <label style="font-size:0.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:8px">
+          W-9 Tax Form <span class="req">*</span>
+        </label>
+        <div class="upload-zone" id="zone_w9">
+          <input type="file" accept=".pdf,.jpg,.jpeg,.png" onchange="handleUpload(this,'w9')">
+          <div class="upload-icon">📋</div>
+          <div class="upload-label">Drop your W-9 here or click to browse</div>
+          <div class="upload-sublabel">Completed and signed IRS Form W-9</div>
+        </div>
+        <div id="file_w9"></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(1)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="validateAndNext(2)">Continue to Direct Deposit &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ STEP 3: DIRECT DEPOSIT ═══════════ -->
+<div class="step-panel" id="step3">
+  <div class="card">
+    <h2 class="card-title">Direct Deposit Authorization</h2>
+    <p class="card-subtitle">Provide your banking information for commission payments. This information is encrypted and stored securely.</p>
+
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Account Holder Name <span class="req">*</span></label>
+        <input type="text" id="accountName" required placeholder="Full name as it appears on the account">
+      </div>
+      <div class="form-group">
+        <label>Bank Name <span class="req">*</span></label>
+        <input type="text" id="bankName" required placeholder="e.g., Chase, Bank of America">
+      </div>
+      <div class="form-group">
+        <label>Account Type <span class="req">*</span></label>
+        <select id="accountType" required>
+          <option value="">Select</option>
+          <option value="checking">Checking</option>
+          <option value="savings">Savings</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Routing Number <span class="req">*</span></label>
+        <input type="text" id="routingNumber" required placeholder="9-digit routing number" maxlength="9">
+      </div>
+      <div class="form-group">
+        <label>Account Number <span class="req">*</span></label>
+        <input type="password" id="accountNumber" required placeholder="Account number">
+      </div>
+      <div class="form-group full">
+        <label>Confirm Account Number <span class="req">*</span></label>
+        <input type="password" id="accountNumberConfirm" required placeholder="Re-enter account number">
+      </div>
+    </div>
+
+    <div style="background:var(--gold-light);border:1px solid var(--gold);border-radius:8px;padding:14px 18px;margin-top:16px">
+      <p style="font-size:0.82rem;color:var(--navy);line-height:1.55">
+        <strong>🔒 Security Notice:</strong> By providing your banking information, you authorize Our 365 Financial Solution LLC to deposit commission payments into the account specified above. This authorization remains in effect until you provide written notice of cancellation.
+      </p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(2)">&larr; Back</button>
+      <button class="btn btn-primary" onclick="validateAndNext(3)">Continue to E-Sign &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ STEP 4: E-SIGN HANDBOOK ═══════════ -->
+<div class="step-panel" id="step4">
+  <div class="card">
+    <h2 class="card-title">Handbook Acknowledgment &amp; E-Signature</h2>
+    <p class="card-subtitle">Review the acknowledgment below, then provide your electronic signature.</p>
+
+    <div class="acknowledgment-text">
+      <h4>Acknowledgment &amp; Agreement</h4>
+      <p>By signing below, I acknowledge that I have received, read, and understand the <strong>Our 365 Financial Solution LLC Broker &amp; Agent Handbook</strong> (Version 1.0). I agree to comply with all policies, procedures, and standards outlined in this handbook.</p>
+      <h4>I understand that:</h4>
+      <ul>
+        <li>This handbook is a guide and does not constitute a contract of employment or guarantee of continued affiliation.</li>
+        <li>The agency reserves the right to modify, amend, or update this handbook at any time.</li>
+        <li>My relationship with Our 365 Financial Solution LLC is that of an independent contractor, not an employee.</li>
+        <li>Violation of these policies may result in corrective action, up to and including termination of my Independent Contractor Agreement.</li>
+        <li>I am responsible for maintaining my insurance license(s), E&amp;O coverage, and compliance with all applicable laws and regulations.</li>
+      </ul>
+      <h4>Independent Contractor Acknowledgment</h4>
+      <p>I understand that as an independent contractor, I am responsible for my own taxes, insurance, and business expenses. I am not entitled to employee benefits, workers' compensation, or unemployment insurance from Our 365 Financial Solution LLC.</p>
+      <h4>Confidentiality Agreement</h4>
+      <p>I agree to keep confidential all proprietary information, client data, business strategies, and internal processes of Our 365 Financial Solution LLC, both during and after my affiliation with the agency.</p>
+    </div>
+
+    <div class="checkbox-row">
+      <input type="checkbox" id="agreeHandbook">
+      <span>I have read and agree to the terms of the <strong>Broker &amp; Agent Handbook</strong>, including all policies on compliance, conduct, and compensation. <span class="req">*</span></span>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="agreeContractor">
+      <span>I acknowledge that I am entering into an <strong>Independent Contractor</strong> relationship with Our 365 Financial Solution LLC. <span class="req">*</span></span>
+    </div>
+    <div class="checkbox-row">
+      <input type="checkbox" id="agreeConfidentiality">
+      <span>I agree to the <strong>Confidentiality Agreement</strong> and will protect all proprietary and client information. <span class="req">*</span></span>
+    </div>
+
+    <div style="margin-top:24px">
+      <label style="font-size:0.82rem;font-weight:600;color:var(--slate);display:block;margin-bottom:10px">
+        Your Signature <span class="req">*</span>
+      </label>
+      <div class="sig-container">
+        <canvas id="sigCanvas" width="660" height="160"></canvas>
+        <button class="sig-clear" onclick="clearSignature()">Clear</button>
+        <div class="sig-line"></div>
+        <div class="sig-label">Sign above</div>
+      </div>
+    </div>
+
+    <div class="form-grid" style="margin-top:18px">
+      <div class="form-group">
+        <label>Full Legal Name (Typed) <span class="req">*</span></label>
+        <input type="text" id="signedName" required placeholder="Type your full legal name">
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="text" id="signDate" readonly>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="goToStep(3)">&larr; Back</button>
+      <button class="btn btn-success" onclick="submitOnboarding()">✓ Submit Onboarding</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ STEP 5: CONFIRMATION ═══════════ -->
+<div class="step-panel" id="step5">
+  <div class="card">
+    <div class="success-panel">
+      <div class="success-icon">✅</div>
+      <h2>Onboarding Complete!</h2>
+      <p>Thank you for submitting your onboarding information. Your application has been received and is being reviewed by the Agency Principal.</p>
+      <div class="success-detail">
+        <dt>Your Agent Number</dt>
+        <dd id="confirmAgentNum" style="font-size:1.1rem;font-weight:700;color:#0B1F3F">—</dd>
+        <dt>Confirmation Number</dt>
+        <dd id="confirmNumber">—</dd>
+        <dt>Submitted By</dt>
+        <dd id="confirmName">—</dd>
+        <dt>Date &amp; Time</dt>
+        <dd id="confirmDate">—</dd>
+        <dt>Next Steps</dt>
+        <dd>Emmanuelle Cador will review your application and initiate carrier contracting within 3–5 business days. You will receive an email confirmation with your login credentials for the Lead Capture System and Agent365Pro.</dd>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// EMAILJS CONFIGURATION — UPDATE THESE WITH YOUR KEYS
+// See EMAIL_SETUP_GUIDE.md for step-by-step instructions
+// ═══════════════════════════════════════════════════════
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY_HERE';      // ← Replace with your EmailJS public key
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID_HERE';      // ← Replace with your EmailJS service ID
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID_HERE';    // ← Replace with your EmailJS template ID
+
+// Initialize EmailJS
+(function() {
+  if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'YOUR_PUBLIC_KEY_HERE') {
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    console.log('[EMAILJS] Initialized');
+  } else {
+    console.warn('[EMAILJS] Not configured yet — email notifications disabled. See EMAIL_SETUP_GUIDE.md');
+  }
+})();
+
+// ─── STATE ───
+let currentStep = 1;
+const completedSteps = new Set();
+const uploadedFiles = {};
+
+// ─── STEPPER NAVIGATION ───
+function goToStep(step) {
+  if (step > currentStep + 1 && !completedSteps.has(step - 1)) return;
+  if (step === 5) return; // only via submit
+
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('visible'));
+  document.getElementById('step' + step).classList.add('visible');
+
+  document.querySelectorAll('.step-item').forEach(s => {
+    const n = parseInt(s.dataset.step);
+    s.classList.remove('active');
+    s.classList.toggle('done', completedSteps.has(n));
+    if (n === step) s.classList.add('active');
+  });
+
+  // Update line fill
+  const pct = ((step - 1) / 4) * 100;
+  document.getElementById('stepLineFill').style.width = pct + '%';
+
+  currentStep = step;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── VALIDATION ───
+function validateAndNext(step) {
+  if (step === 1) {
+    const required = ['firstName','lastName','email','phone','address','dob','ssn','licenseNumber','licenseType','licenseExpiry','npn'];
+    let valid = true;
+    required.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('error'); valid = false; }
+      else { el.classList.remove('error'); }
+    });
+    if (!valid) { showToast('Please complete all required fields.', 'error'); return; }
+  }
+
+  if (step === 2) {
+    const requiredUploads = ['photoId','license','eo','w9'];
+    const missing = requiredUploads.filter(k => !uploadedFiles[k]);
+    if (missing.length) { showToast('Please upload all required documents.', 'error'); return; }
+  }
+
+  if (step === 3) {
+    const required = ['accountName','bankName','accountType','routingNumber','accountNumber','accountNumberConfirm'];
+    let valid = true;
+    required.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('error'); valid = false; }
+      else { el.classList.remove('error'); }
+    });
+    if (!valid) { showToast('Please complete all banking fields.', 'error'); return; }
+    const acct = document.getElementById('accountNumber').value;
+    const confirm = document.getElementById('accountNumberConfirm').value;
+    if (acct !== confirm) { showToast('Account numbers do not match.', 'error'); return; }
+  }
+
+  completedSteps.add(step);
+  goToStep(step + 1);
+
+  // Pre-fill e-sign date
+  if (step === 3) {
+    document.getElementById('signDate').value = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  }
+}
+
+// ─── FILE UPLOAD ───
+function handleUpload(input, key) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) { showToast('File too large. Max 10MB.', 'error'); return; }
+
+  uploadedFiles[key] = file;
+  const container = document.getElementById('file_' + key);
+  container.innerHTML = `
+    <div class="uploaded-file">
+      <span>📎 ${file.name} (${(file.size/1024).toFixed(0)} KB)</span>
+      <button class="remove-btn" onclick="removeUpload('${key}')">✕ Remove</button>
+    </div>`;
+  document.getElementById('zone_' + key).style.borderColor = 'var(--success)';
+}
+
+function removeUpload(key) {
+  delete uploadedFiles[key];
+  document.getElementById('file_' + key).innerHTML = '';
+  document.getElementById('zone_' + key).style.borderColor = '';
+  const zone = document.getElementById('zone_' + key);
+  zone.querySelector('input[type=file]').value = '';
+}
+
+// Drag and drop
+document.querySelectorAll('.upload-zone').forEach(zone => {
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('dragover');
+    const input = zone.querySelector('input[type=file]');
+    input.files = e.dataTransfer.files;
+    input.dispatchEvent(new Event('change'));
+  });
+});
+
+// ─── SIGNATURE PAD ───
+const canvas = document.getElementById('sigCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, hasSigned = false;
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  canvas.width = rect.width;
+  canvas.height = 160;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+canvas.addEventListener('pointerdown', e => {
+  drawing = true; hasSigned = true;
+  ctx.beginPath();
+  const r = canvas.getBoundingClientRect();
+  ctx.moveTo(e.clientX - r.left, e.clientY - r.top);
+});
+canvas.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const r = canvas.getBoundingClientRect();
+  ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#0B1F3F';
+  ctx.lineTo(e.clientX - r.left, e.clientY - r.top);
+  ctx.stroke();
+});
+canvas.addEventListener('pointerup', () => drawing = false);
+canvas.addEventListener('pointerleave', () => drawing = false);
+
+function clearSignature() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  hasSigned = false;
+}
+
+// ─── INDEXEDDB (shared with admin dashboard) ───
+const DB_NAME = 'Our365Onboarding';
+const DB_VERSION = 1;
+const STORE = 'submissions';
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE)) {
+        const store = db.createObjectStore(STORE, { keyPath: 'id' });
+        store.createIndex('status', 'status', { unique: false });
+        store.createIndex('submittedAt', 'submittedAt', { unique: false });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function saveSubmission(data) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(data);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+// ─── AGENT NUMBER GENERATOR ───
+async function getNextAgentNumber() {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const store = tx.objectStore(STORE);
+    const req = store.getAll();
+    req.onsuccess = () => {
+      const existing = req.result
+        .map(s => s.agentNumber || '')
+        .filter(n => n.startsWith('A365-'))
+        .map(n => parseInt(n.replace('A365-', ''), 10))
+        .filter(n => !isNaN(n));
+      const maxNum = existing.length > 0 ? Math.max(...existing) : 0;
+      const next = maxNum + 1;
+      resolve('A365-' + String(next).padStart(4, '0'));
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ─── SUBMIT ───
+async function submitOnboarding() {
+  // Validate e-sign step
+  if (!document.getElementById('agreeHandbook').checked ||
+      !document.getElementById('agreeContractor').checked ||
+      !document.getElementById('agreeConfidentiality').checked) {
+    showToast('Please check all acknowledgment boxes.', 'error'); return;
+  }
+  if (!hasSigned) { showToast('Please provide your signature.', 'error'); return; }
+  if (!document.getElementById('signedName').value.trim()) {
+    showToast('Please type your full legal name.', 'error'); return;
+  }
+
+  // Show loading state
+  const submitBtn = document.querySelector('#step4 .btn-success');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Saving...';
+  submitBtn.disabled = true;
+
+  try {
+    // Convert uploaded files to base64 for storage
+    const documents = {};
+    for (const [key, file] of Object.entries(uploadedFiles)) {
+      const dataUrl = await fileToDataUrl(file);
+      documents[key] = { name: file.name, size: file.size, type: file.type, dataUrl };
+    }
+
+    // Generate confirmation number, agent number, and submission ID
+    const confNum = 'OB-' + Date.now().toString(36).toUpperCase().slice(-6) + '-365';
+    const agentNumber = await getNextAgentNumber();
+    const submissionId = 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+
+    // Build full submission object
+    const submission = {
+      id: submissionId,
+      confirmationNumber: confNum,
+      agentNumber: agentNumber,
+      status: 'pending',
+      submittedAt: new Date().toISOString(),
+      adminNotes: '',
+
+      // Step 1: Application
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName: document.getElementById('lastName').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      address: document.getElementById('address').value.trim(),
+      dob: document.getElementById('dob').value,
+      ssn: document.getElementById('ssn').value,
+      licenseNumber: document.getElementById('licenseNumber').value.trim(),
+      licenseType: document.getElementById('licenseType').value,
+      licenseExpiry: document.getElementById('licenseExpiry').value,
+      npn: document.getElementById('npn').value.trim(),
+      experience: document.getElementById('experience').value,
+      lineLife: document.getElementById('lineLife').checked,
+      lineHealth: document.getElementById('lineHealth').checked,
+      lineAnnuity: document.getElementById('lineAnnuity').checked,
+      lineMedicare: document.getElementById('lineMedicare').checked,
+      referringBroker: document.getElementById('referringBroker').value.trim(),
+      eoCarrier: document.getElementById('eoCarrier').value.trim(),
+      regulatoryAction: document.getElementById('regulatoryAction').value,
+      regulatoryExplain: document.getElementById('regulatoryExplain')?.value || '',
+
+      // Step 2: Documents (as base64)
+      documents: documents,
+
+      // Step 3: Banking
+      accountName: document.getElementById('accountName').value.trim(),
+      bankName: document.getElementById('bankName').value.trim(),
+      accountType: document.getElementById('accountType').value,
+      routingNumber: document.getElementById('routingNumber').value.trim(),
+      accountNumber: document.getElementById('accountNumber').value.trim(),
+
+      // Step 4: E-Sign
+      signedName: document.getElementById('signedName').value.trim(),
+      signDate: document.getElementById('signDate').value,
+      signatureData: canvas.toDataURL(),
+    };
+
+    // Save to IndexedDB (accessible by admin dashboard)
+    await saveSubmission(submission);
+    console.log('[ONBOARDING] Saved to IndexedDB:', confNum);
+
+    // ── SEND EMAIL NOTIFICATION ──
+    // Uses a single {{{html_content}}} variable in EmailJS template
+    // so you only need to TYPE one line in the EmailJS editor — no pasting needed
+    try {
+      const docList = Object.keys(documents).map(k =>
+        ({photoId:'Photo ID', license:'Insurance License', eo:'E&amp;O Certificate', w9:'W-9 Form'}[k] || k)
+      ).join(', ');
+
+      const linesOfAuth = [
+        submission.lineLife ? 'Life' : '',
+        submission.lineHealth ? 'Health' : '',
+        submission.lineAnnuity ? 'Annuities' : '',
+        submission.lineMedicare ? 'Medicare' : '',
+      ].filter(Boolean).join(', ') || 'None selected';
+
+      const subDate = new Date().toLocaleString('en-US', { year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      const adminUrl = window.location.origin + '/admin.html';
+      const brokerName = `${submission.firstName} ${submission.lastName}`;
+      const regAction = submission.regulatoryAction === 'yes' ? '<span style="color:#DC2626;font-weight:bold">YES — see admin dashboard</span>' : 'No';
+
+      // Build the entire email HTML in code — EmailJS template just needs {{{html_content}}}
+      const htmlContent = `
+<div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f8fa;padding:20px">
+  <div style="background:#0B1F3F;padding:24px 32px;border-radius:12px 12px 0 0;text-align:center">
+    <div style="background:#C8982E;color:#0B1F3F;font-weight:bold;font-size:20px;width:48px;height:48px;line-height:48px;border-radius:10px;margin:0 auto 12px;font-family:Georgia,serif">365</div>
+    <h1 style="color:#FFFFFF;margin:0;font-size:18px;font-family:Georgia,serif">New Broker Onboarding Submission</h1>
+    <p style="color:#C8982E;margin:6px 0 0;font-size:12px">Our 365 Financial Solution LLC</p>
+  </div>
+  <div style="background:#ffffff;padding:28px 32px;border:1px solid #dde1e8;border-top:none;border-radius:0 0 12px 12px">
+    <div style="background:#DCFCE7;border:1px solid #16A34A;border-radius:8px;padding:14px 18px;margin-bottom:20px;text-align:center">
+      <p style="margin:0;color:#16A34A;font-size:13px;font-weight:bold">NEW SUBMISSION RECEIVED</p>
+    </div>
+    <h2 style="color:#0B1F3F;margin:0 0 4px;font-size:20px;font-family:Georgia,serif">${brokerName}</h2>
+    <p style="color:#C8982E;margin:0 0 20px;font-size:13px;font-weight:bold">Agent # ${agentNumber}</p>
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275;width:40%"><strong>Email</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.email}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>Phone</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.phone}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>License #</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.licenseNumber} (${submission.licenseType})</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>License Expiry</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.licenseExpiry}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>NPN</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.npn}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>Lines of Authority</strong></td><td style="padding:10px 0;color:#1A1A2E">${linesOfAuth}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>Experience</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.experience || 'Not specified'}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>Referring Broker</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.referringBroker || 'None'}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>E&amp;O Carrier</strong></td><td style="padding:10px 0;color:#1A1A2E">${submission.eoCarrier || 'Not specified'}</td></tr>
+      <tr style="border-bottom:1px solid #f0f0f0"><td style="padding:10px 0;color:#5A6275"><strong>Regulatory Action?</strong></td><td style="padding:10px 0;color:#1A1A2E">${regAction}</td></tr>
+      <tr><td style="padding:10px 0;color:#5A6275"><strong>Documents Uploaded</strong></td><td style="padding:10px 0;color:#1A1A2E">${docList}</td></tr>
+    </table>
+    <div style="margin-top:20px;padding:16px;background:#F5EDD6;border-radius:8px;border-left:4px solid #C8982E">
+      <p style="margin:0;font-size:13px;color:#0B1F3F"><strong>Confirmation #:</strong> ${confNum}<br><strong>Agent #:</strong> ${agentNumber}<br><strong>Submitted:</strong> ${subDate}</p>
+    </div>
+    <div style="margin-top:24px;text-align:center">
+      <a href="${adminUrl}" style="display:inline-block;background:#C8982E;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:14px">Review in Admin Dashboard</a>
+    </div>
+    <p style="margin-top:20px;font-size:11px;color:#5A6275;text-align:center">Automated notification from the Our 365 Onboarding Portal</p>
+  </div>
+</div>`;
+
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          html_content: htmlContent,
+          broker_name: brokerName,
+          confirmation_number: confNum,
+        }
+      );
+      console.log('[ONBOARDING] Email notification sent successfully');
+    } catch (emailErr) {
+      // Email failure should NOT block submission — log and continue
+      console.warn('[ONBOARDING] Email notification failed (submission still saved):', emailErr);
+    }
+
+    // Show success
+    completedSteps.add(4);
+    completedSteps.add(5);
+
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('visible'));
+    document.getElementById('step5').classList.add('visible');
+
+    document.querySelectorAll('.step-item').forEach(s => {
+      s.classList.remove('active');
+      s.classList.add('done');
+    });
+    document.getElementById('stepLineFill').style.width = '100%';
+
+    document.getElementById('confirmAgentNum').textContent = agentNumber;
+    document.getElementById('confirmNumber').textContent = confNum;
+    document.getElementById('confirmName').textContent = submission.firstName + ' ' + submission.lastName;
+    document.getElementById('confirmDate').textContent = new Date().toLocaleString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  } catch (err) {
+    console.error('[ONBOARDING] Save error:', err);
+    showToast('Error saving your submission. Please try again.', 'error');
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+}
+
+// ─── TOAST NOTIFICATIONS ───
+function showToast(msg, type='info') {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.cssText = `
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    padding:12px 24px;border-radius:8px;font-size:0.85rem;font-weight:600;
+    font-family:var(--font-body);z-index:9999;
+    box-shadow:0 4px 20px rgba(0,0,0,0.15);
+    animation:fadeUp 0.3s ease;
+    background:${type==='error'?'var(--error)':'var(--navy)'};
+    color:var(--white);`;
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
+}
+
+// ─── REGULATORY TOGGLE ───
+document.getElementById('regulatoryAction').addEventListener('change', function() {
+  document.getElementById('regulatoryExplainGroup').style.display = this.value === 'yes' ? 'flex' : 'none';
+});
+
+// ─── SSN FORMATTING ───
+document.getElementById('ssn').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '').slice(0, 9);
+  if (v.length > 5) v = v.slice(0,3) + '-' + v.slice(3,5) + '-' + v.slice(5);
+  else if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+  this.value = v;
+});
+
+// ─── PHONE FORMATTING ───
+document.getElementById('phone').addEventListener('input', function() {
+  let v = this.value.replace(/\D/g, '').slice(0, 10);
+  if (v.length > 6) v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
+  else if (v.length > 3) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
+  this.value = v;
+});
+</script>
+</body>
+</html>
