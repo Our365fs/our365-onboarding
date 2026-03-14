@@ -511,9 +511,9 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);min-hei
 // EMAILJS CONFIGURATION — UPDATE THESE WITH YOUR KEYS
 // See EMAIL_SETUP_GUIDE.md for step-by-step instructions
 // ═══════════════════════════════════════════════════════
-const EMAILJS_PUBLIC_KEY = 'ESj_ZXJOCKi-is5Ya';      // ← Replace with your EmailJS public key
-const EMAILJS_SERVICE_ID = 'service_95qnnh4';      // ← Replace with your EmailJS service ID
-const EMAILJS_TEMPLATE_ID = 'template_12zk08t';    // ← Replace with your EmailJS template ID
+const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY_HERE';      // ← Replace with your EmailJS public key
+const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID_HERE';      // ← Replace with your EmailJS service ID
+const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID_HERE';    // ← Replace with your EmailJS template ID
 
 // Initialize EmailJS
 (function() {
@@ -858,6 +858,17 @@ async function submitOnboarding() {
     </table>
     <div style="margin-top:20px;padding:16px;background:#F5EDD6;border-radius:8px;border-left:4px solid #C8982E">
       <p style="margin:0;font-size:13px;color:#0B1F3F"><strong>Confirmation #:</strong> ${confNum}<br><strong>Agent #:</strong> ${agentNumber}<br><strong>Submitted:</strong> ${subDate}</p>
+    </div>
+    <div style="margin-top:20px">
+      <p style="font-size:13px;color:#5A6275;font-weight:bold;margin:0 0 8px">E-Signature:</p>
+      <div style="background:#f7f8fa;border:1px solid #dde1e8;border-radius:8px;padding:8px;text-align:center">
+        <img src="${submission.signatureData}" alt="Broker Signature" style="max-width:100%;max-height:80px">
+      </div>
+      <p style="font-size:12px;color:#5A6275;margin:6px 0 0">Signed by: <strong>${submission.signedName}</strong> on ${submission.signDate}</p>
+    </div>
+    <div style="margin-top:20px;padding:16px;background:#f7f8fa;border:1px solid #dde1e8;border-radius:8px;text-align:center">
+      <p style="margin:0 0 10px;font-size:13px;color:#0B1F3F;font-weight:bold">Broker &amp; Agent Handbook</p>
+      <a href="${window.location.origin}/Our365_Broker_Agent_Handbook.pdf" style="display:inline-block;background:#0B1F3F;color:#ffffff;text-decoration:none;padding:10px 24px;border-radius:8px;font-weight:bold;font-size:13px">Download Handbook (PDF)</a>
     </div>
     <div style="margin-top:24px;text-align:center">
       <a href="${adminUrl}" style="display:inline-block;background:#C8982E;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;font-size:14px">Review in Admin Dashboard</a>
