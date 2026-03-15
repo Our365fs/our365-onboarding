@@ -810,7 +810,7 @@ async function submitOnboarding() {
     console.log('[ONBOARDING] Saved to IndexedDB:', confNum);
 
     // ── SEND EMAIL NOTIFICATION ──
-    // Uses a single {{{html_content}}} variable in EmailJS template
+    // Uses a single {{{htmlcontent}}} variable in EmailJS template
     // so you only need to TYPE one line in the EmailJS editor — no pasting needed
     try {
       const docList = Object.keys(documents).map(k =>
@@ -829,7 +829,7 @@ async function submitOnboarding() {
       const brokerName = `${submission.firstName} ${submission.lastName}`;
       const regAction = submission.regulatoryAction === 'yes' ? '<span style="color:#DC2626;font-weight:bold">YES — see admin dashboard</span>' : 'No';
 
-      // Build the entire email HTML in code — EmailJS template just needs {{{html_content}}}
+      // Build the entire email HTML in code — EmailJS template just needs {{{htmlcontent}}}
       const htmlContent = `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f8fa;padding:20px">
   <div style="background:#0B1F3F;padding:24px 32px;border-radius:12px 12px 0 0;text-align:center">
@@ -881,6 +881,7 @@ async function submitOnboarding() {
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
+          to_email:'onboarding365fs@gmail.com',
           html_content: htmlContent,
           broker_name: brokerName,
           confirmation_number: confNum,
