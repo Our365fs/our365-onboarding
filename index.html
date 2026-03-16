@@ -954,9 +954,11 @@ async function submitOnboarding() {
         }
       );
       console.log('[ONBOARDING] Email notification sent successfully');
+      alert('EMAIL SENT SUCCESSFULLY! Check your Gmail.');
     } catch (emailErr) {
       // Email failure should NOT block submission — log and continue
       console.warn('[ONBOARDING] Email notification failed (submission still saved):', emailErr);
+      alert('EMAIL FAILED: ' + (emailErr.text || emailErr.message || JSON.stringify(emailErr)));
     }
 
     // Show success
