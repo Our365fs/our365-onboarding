@@ -136,6 +136,7 @@ body{font-family:var(--font-body);color:var(--text);background:var(--bg);min-hei
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -525,6 +526,15 @@ const EMAILJS_TEMPLATE_ID = 'template_mnb46qe';
   }
 })();
 
+// ═══════════════════════════════════════════════════════
+// SUPABASE CONFIGURATION
+// ═══════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xQ-LNXtup4y8ybtUcLn9bg_jnqmF0g2';
+const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+if (supabase) { console.log('[SUPABASE] Initialized'); }
+else { console.warn('[SUPABASE] Not available — using local storage only'); }
+
 // ─── STATE ───
 let currentStep = 1;
 const completedSteps = new Set();
@@ -707,6 +717,23 @@ function fileToDataUrl(file) {
 
 // ─── AGENT NUMBER GENERATOR ───
 async function getNextAgentNumber() {
+  // Try Supabase first (cross-device)
+  if (supabase) {
+    try {
+      const { data } = await supabase
+        .from('onboarding_submissions')
+        .select('agent_number')
+        .like('agent_number', 'A365-%')
+        .order('agent_number', { ascending: false })
+        .limit(1);
+      if (data && data.length > 0) {
+        const maxNum = parseInt(data[0].agent_number.replace('A365-', ''), 10);
+        return 'A365-' + String(maxNum + 1).padStart(4, '0');
+      }
+      return 'A365-0001';
+    } catch (e) { console.warn('[SUPABASE] Agent number lookup failed, using local:', e); }
+  }
+  // Fallback to IndexedDB
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readonly');
@@ -719,8 +746,7 @@ async function getNextAgentNumber() {
         .map(n => parseInt(n.replace('A365-', ''), 10))
         .filter(n => !isNaN(n));
       const maxNum = existing.length > 0 ? Math.max(...existing) : 0;
-      const next = maxNum + 1;
-      resolve('A365-' + String(next).padStart(4, '0'));
+      resolve('A365-' + String(maxNum + 1).padStart(4, '0'));
     };
     req.onerror = () => reject(req.error);
   });
@@ -805,12 +831,45 @@ async function submitOnboarding() {
       signatureData: canvas.toDataURL(),
     };
 
-    // Save to IndexedDB (accessible by admin dashboard)
+    // Save to IndexedDB (local backup)
     await saveSubmission(submission);
     console.log('[ONBOARDING] Saved to IndexedDB:', confNum);
 
+    // Save to Supabase (cross-device access)
+    if (supabase) {
+      try {
+        const lines = [
+          submission.lineLife ? 'Life' : '',
+          submission.lineHealth ? 'Health' : '',
+          submission.lineAnnuity ? 'Annuities' : '',
+          submission.lineMedicare ? 'Medicare' : '',
+        ].filter(Boolean).join(', ');
+
+        const { error } = await supabase.from('onboarding_submissions').insert({
+          id: submissionId,
+          agent_number: agentNumber,
+          confirmation_number: confNum,
+          status: 'pending',
+          first_name: submission.firstName,
+          last_name: submission.lastName,
+          email: submission.email,
+          phone: submission.phone,
+          address: submission.address,
+          license_number: submission.licenseNumber,
+          license_type: submission.licenseType,
+          npn: submission.npn,
+          signed_name: submission.signedName,
+          sign_date: submission.signDate,
+          signature_data: submission.signatureData,
+          admin_notes: '',
+        });
+        if (error) console.warn('[SUPABASE] Insert error:', error);
+        else console.log('[SUPABASE] Saved:', confNum);
+      } catch (e) { console.warn('[SUPABASE] Save failed:', e); }
+    }
+
     // ── SEND EMAIL NOTIFICATION ──
-    // Uses a single {{{htmlcontent}}} variable in EmailJS template
+    // Uses a single {{{html_content}}} variable in EmailJS template
     // so you only need to TYPE one line in the EmailJS editor — no pasting needed
     try {
       const docList = Object.keys(documents).map(k =>
@@ -829,7 +888,7 @@ async function submitOnboarding() {
       const brokerName = `${submission.firstName} ${submission.lastName}`;
       const regAction = submission.regulatoryAction === 'yes' ? '<span style="color:#DC2626;font-weight:bold">YES — see admin dashboard</span>' : 'No';
 
-      // Build the entire email HTML in code — EmailJS template just needs {{{htmlcontent}}}
+      // Build the entire email HTML in code — EmailJS template just needs {{{html_content}}}
       const htmlContent = `
 <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#f7f8fa;padding:20px">
   <div style="background:#0B1F3F;padding:24px 32px;border-radius:12px 12px 0 0;text-align:center">
@@ -881,7 +940,6 @@ async function submitOnboarding() {
         EMAILJS_SERVICE_ID,
         EMAILJS_TEMPLATE_ID,
         {
-          to_email:'onboarding365fs@gmail.com',
           html_content: htmlContent,
           broker_name: brokerName,
           confirmation_number: confNum,

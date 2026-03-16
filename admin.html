@@ -157,6 +157,7 @@ tr:hover{background:rgba(200,152,46,0.03)}
   .detail-panel{width:100%}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -256,7 +257,45 @@ tr:hover{background:rgba(200,152,46,0.03)}
 
 <script>
 // ═══════════════════════════════════════════════
-// DATABASE (IndexedDB)
+// SUPABASE
+// ═══════════════════════════════════════════════
+const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xQ-LNXtup4y8ybtUcLn9bg_jnqmF0g2';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+if (sb) console.log('[SUPABASE] Admin connected');
+
+function mapDbToApp(row) {
+  return {
+    id: row.id,
+    agentNumber: row.agent_number || '',
+    confirmationNumber: row.confirmation_number || '',
+    status: row.status || 'pending',
+    firstName: row.first_name || '',
+    lastName: row.last_name || '',
+    email: row.email || '',
+    phone: row.phone || '',
+    address: row.address || '',
+    dob: row.dob || '',
+    ssn: row.ssn_last4 ? '***-**-' + row.ssn_last4 : '',
+    licenseNumber: row.license_number || '',
+    licenseType: row.license_type || '',
+    licenseExpiry: row.license_expiry || '',
+    npn: row.npn || '',
+    experience: row.experience || '',
+    referringBroker: row.referring_broker || '',
+    eoCarrier: row.eo_carrier || '',
+    regulatoryAction: row.regulatory_action || 'no',
+    signedName: row.signed_name || '',
+    signDate: row.sign_date || '',
+    signatureData: row.signature_data || '',
+    adminNotes: row.admin_notes || '',
+    submittedAt: row.submitted_at || new Date().toISOString(),
+    documents: {},
+  };
+}
+
+// ═══════════════════════════════════════════════
+// DATABASE (IndexedDB fallback)
 // ═══════════════════════════════════════════════
 const DB_NAME = 'Our365Onboarding';
 const DB_VERSION = 1;
@@ -279,6 +318,21 @@ function openDB() {
 }
 
 async function getAllSubmissions() {
+  // Try Supabase first
+  if (sb) {
+    try {
+      const { data, error } = await sb
+        .from('onboarding_submissions')
+        .select('*')
+        .order('submitted_at', { ascending: false });
+      if (!error && data) {
+        console.log('[SUPABASE] Loaded', data.length, 'submissions');
+        return data.map(mapDbToApp);
+      }
+      console.warn('[SUPABASE] Query error:', error);
+    } catch (e) { console.warn('[SUPABASE] Failed:', e); }
+  }
+  // Fallback to IndexedDB
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readonly');
@@ -290,6 +344,16 @@ async function getAllSubmissions() {
 }
 
 async function getSubmission(id) {
+  if (sb) {
+    try {
+      const { data, error } = await sb
+        .from('onboarding_submissions')
+        .select('*')
+        .eq('id', id)
+        .single();
+      if (!error && data) return mapDbToApp(data);
+    } catch (e) { console.warn('[SUPABASE] Get failed:', e); }
+  }
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readonly');
@@ -300,6 +364,16 @@ async function getSubmission(id) {
 }
 
 async function updateSubmission(data) {
+  if (sb) {
+    try {
+      const { error } = await sb
+        .from('onboarding_submissions')
+        .update({ status: data.status, admin_notes: data.adminNotes })
+        .eq('id', data.id);
+      if (!error) { console.log('[SUPABASE] Updated:', data.id); return; }
+      console.warn('[SUPABASE] Update error:', error);
+    } catch (e) { console.warn('[SUPABASE] Update failed:', e); }
+  }
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
