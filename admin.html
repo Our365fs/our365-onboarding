@@ -260,9 +260,17 @@ tr:hover{background:rgba(200,152,46,0.03)}
 // SUPABASE
 // ═══════════════════════════════════════════════
 const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_xQ-LNXtup4y8ybtUcLn9bg_jnqmF0g2';
-const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-if (sb) console.log('[SUPABASE] Admin connected');
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTY1MTEsImV4cCI6MjA4OTE5MjUxMX0.e8fqOaSJWBrAElKq30s293k6jpkQI0YhxdqOL6bxuVM';
+let sb = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('[SUPABASE] Admin connected');
+  }
+} catch (e) {
+  console.warn('[SUPABASE] Admin init failed:', e);
+  sb = null;
+}
 
 function mapDbToApp(row) {
   return {

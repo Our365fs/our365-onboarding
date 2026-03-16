@@ -530,10 +530,17 @@ const EMAILJS_TEMPLATE_ID = 'template_mnb46qe';
 // SUPABASE CONFIGURATION
 // ═══════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_xQ-LNXtup4y8ybtUcLn9bg_jnqmF0g2';
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-if (supabase) { console.log('[SUPABASE] Initialized'); }
-else { console.warn('[SUPABASE] Not available — using local storage only'); }
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTY1MTEsImV4cCI6MjA4OTE5MjUxMX0.e8fqOaSJWBrAElKq30s293k6jpkQI0YhxdqOL6bxuVM';
+let sbClient = null;
+try {
+  if (window.supabase && window.supabase.createClient) {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('[SUPABASE] Initialized');
+  }
+} catch (e) {
+  console.warn('[SUPABASE] Init failed — using local storage only:', e);
+  sbClient = null;
+}
 
 // ─── STATE ───
 let currentStep = 1;
@@ -718,9 +725,9 @@ function fileToDataUrl(file) {
 // ─── AGENT NUMBER GENERATOR ───
 async function getNextAgentNumber() {
   // Try Supabase first (cross-device)
-  if (supabase) {
+  if (sbClient) {
     try {
-      const { data } = await supabase
+      const { data } = await sbClient
         .from('onboarding_submissions')
         .select('agent_number')
         .like('agent_number', 'A365-%')
@@ -836,7 +843,7 @@ async function submitOnboarding() {
     console.log('[ONBOARDING] Saved to IndexedDB:', confNum);
 
     // Save to Supabase (cross-device access)
-    if (supabase) {
+    if (sbClient) {
       try {
         const lines = [
           submission.lineLife ? 'Life' : '',
@@ -845,7 +852,7 @@ async function submitOnboarding() {
           submission.lineMedicare ? 'Medicare' : '',
         ].filter(Boolean).join(', ');
 
-        const { error } = await supabase.from('onboarding_submissions').insert({
+        const { error } = await sbClient.from('onboarding_submissions').insert({
           id: submissionId,
           agent_number: agentNumber,
           confirmation_number: confNum,
