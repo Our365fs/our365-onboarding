@@ -236,7 +236,7 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);min-height:1
 <!-- ═══════════ CTA BANNER ═══════════ -->
 <section class="cta-banner">
   <h2>Questions? We're Here to Help.</h2>
-  <p>Call us at (844) 687-3653 or email info@our365financialsolution.net</p>
+  <p>Call us at (844) 687-3653 or email <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bed7d0d8d1fed1cbcc8d888bd8d7d0dfd0ddd7dfd2cdd1d2cbcad7d1d090d0dbca">[email&#160;protected]</a></p>
   <a href="https://our365financialsolution.net/contact-us">Contact Us</a>
 </section>
 
@@ -244,7 +244,7 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);min-height:1
 <div class="hub-footer">
   Our 365 Financial Solution LLC &bull; Lauderdale Lakes, FL<br>
   <a href="https://our365financialsolution.net">our365financialsolution.net</a> &bull;
-  <a href="mailto:info@our365financialsolution.net">info@our365financialsolution.net</a><br>
+  <a href="/cdn-cgi/l/email-protection#ec85828a83ac83999edfdad98a85828d828f858d809f83809998858382c2828998"><span class="__cf_email__" data-cfemail="f59c9b939ab59a8087c6c3c0939c9b949b969c9499869a9980819c9a9bdb9b9081">[email&#160;protected]</span></a><br>
   &copy; 2026 Our 365 Financial Solution LLC. All rights reserved.
 </div>
 
@@ -309,9 +309,9 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);min-height:1
           </div>
           <div class="school-banner">
             <h4>Florida Insurance School</h4>
-            <p>Pre-Licensing &amp; Continuing Education courses available online. Use the link below to access your courses.</p>
+            <p>Pre-Licensing &amp; Continuing Education courses available online. Click below to access your courses.</p>
             <a href="https://floridaschool.com/365" target="_blank" class="school-btn">Access School &rarr;</a>
-            <div class="school-note">Password: <strong>365</strong></div>
+            <div class="school-note">When prompted, your access code is: <strong>365</strong></div>
           </div>
         </div>
       </div>
@@ -362,9 +362,9 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);min-height:1
           </div>
           <div class="school-banner">
             <h4>Share This With Your Recruit</h4>
-            <p>Florida Insurance School — Pre-Licensing &amp; Continuing Education</p>
+            <p>Florida Insurance School — Pre-Licensing &amp; Continuing Education. Access code: <strong>365</strong></p>
             <a href="https://floridaschool.com/365" target="_blank" class="school-btn">School Link &rarr;</a>
-            <div class="school-note">Password: <strong>365</strong> &nbsp;|&nbsp; <button onclick="copySchoolLink()" style="background:none;border:none;color:var(--info);font-weight:600;cursor:pointer;font-family:var(--font);font-size:0.72rem">Copy Link</button></div>
+            <div class="school-note"><button onclick="copySchoolLink()" style="background:none;border:none;color:var(--info);font-weight:600;cursor:pointer;font-family:var(--font);font-size:0.72rem">Copy Link to Share</button></div>
           </div>
         </div>
       </div>
@@ -374,7 +374,7 @@ body{font-family:var(--font);color:var(--text);background:var(--bg);min-height:1
 </div>
 
 <!-- ═══════════ SUPABASE ═══════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTY1MTEsImV4cCI6MjA4OTE5MjUxMX0.e8fqOaSJWBrAElKq30s293k6jpkQI0YhxdqOL6bxuVM';
@@ -506,21 +506,4 @@ function copySchoolLink() {
   document.getElementById(id).addEventListener('input', function() {
     let v = this.value.replace(/\D/g, '').slice(0, 10);
     if (v.length > 6) v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
-    else if (v.length > 3) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
-    this.value = v;
-  });
-});
-
-// ─── TOAST ───
-function showToast(msg, type) {
-  const existing = document.querySelector('.toast');
-  if (existing) existing.remove();
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => t.remove(), 3000);
-}
-</script>
-</body>
-</html>
+    else if (v.length > 3) v = '(' + v.slice
