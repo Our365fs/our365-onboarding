@@ -1,6 +1,722 @@
-365
-Agent365Pro
-Sign in to your portal
-Sign In
-Our 365 Financial Solution LLC
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent365Pro | Our 365 Financial Solution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0B1F3F;--navy-l:#132D54;--gold:#C8982E;--gold-l:#F5EDD6;
+  --slate:#3E4C5E;--bg:#F4F5F7;--white:#FFF;--border:#DDE1E8;
+  --text:#1A1A2E;--text-s:#5A6275;--succ:#16A34A;--succ-bg:#DCFCE7;
+  --err:#DC2626;--err-bg:#FEE2E2;--warn:#D97706;--warn-bg:#FEF3C7;
+  --info:#2563EB;--info-bg:#DBEAFE;
+  --sh:0 1px 3px rgba(11,31,63,0.06);--sh-md:0 4px 12px rgba(11,31,63,0.08);
+  --r:10px;--f:'DM Sans',system-ui,sans-serif;--fd:'Playfair Display',Georgia,serif;
+}
+html{font-size:16px}
+body{font-family:var(--f);color:var(--text);background:var(--bg);min-height:100vh;-webkit-font-smoothing:antialiased}
 
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy);padding:24px}
+.login-box{background:var(--white);border-radius:16px;padding:40px;width:380px;max-width:100%;text-align:center;box-shadow:var(--sh-md)}
+.login-box .logo{width:52px;height:52px;background:var(--gold);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:22px;font-weight:700;color:var(--navy);margin:0 auto 16px}
+.login-box h2{font-family:var(--fd);font-size:1.3rem;color:var(--navy);margin-bottom:4px}
+.login-box p{font-size:0.82rem;color:var(--text-s);margin-bottom:20px}
+.login-box input{width:100%;font-family:var(--f);font-size:0.88rem;padding:11px 16px;border:1.5px solid var(--border);border-radius:8px;margin-bottom:10px;outline:none;transition:border 0.2s}
+.login-box input:focus{border-color:var(--gold)}
+.login-box .btn{width:100%;padding:12px;font-size:0.9rem;font-weight:600;border:none;border-radius:8px;cursor:pointer;font-family:var(--f);background:var(--gold);color:var(--white);transition:background 0.2s}
+.login-box .btn:hover{background:#B8891F}
+.login-err{color:var(--err);font-size:0.8rem;margin-bottom:8px;display:none}
+
+/* APP LAYOUT */
+.app{display:none;min-height:100vh}
+.topbar{background:var(--navy);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--gold)}
+.topbar-l{display:flex;align-items:center;gap:10px}
+.topbar-logo{width:34px;height:34px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;font-weight:700;color:var(--navy)}
+.topbar-name{font-weight:600;font-size:0.9rem;color:var(--white)}
+.topbar-badge{font-size:0.65rem;font-weight:600;padding:3px 10px;border-radius:12px;margin-left:6px}
+.badge-admin{background:rgba(200,152,46,0.2);color:var(--gold)}
+.badge-agent{background:rgba(22,163,74,0.2);color:#4ADE80}
+.topbar-r{display:flex;align-items:center;gap:12px}
+.topbar-user{font-size:0.78rem;color:rgba(255,255,255,0.6)}
+.topbar-avatar{width:30px;height:30px;border-radius:50%;background:var(--info-bg);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;color:var(--info)}
+.btn-logout{background:none;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);font-family:var(--f);font-size:0.7rem;padding:5px 12px;border-radius:6px;cursor:pointer;transition:all 0.2s}
+.btn-logout:hover{color:var(--white);background:rgba(255,255,255,0.1)}
+
+.main-layout{display:flex}
+
+/* SIDEBAR */
+.sidebar{width:200px;background:var(--white);border-right:1px solid var(--border);min-height:calc(100vh - 52px);padding:12px 0;flex-shrink:0;position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:0.82rem;color:var(--text-s);cursor:pointer;transition:all 0.15s;border-left:3px solid transparent}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--info-bg);color:var(--info);font-weight:600;border-left-color:var(--info)}
+.nav-item .nav-badge{background:var(--err);color:var(--white);font-size:0.6rem;padding:1px 6px;border-radius:8px;margin-left:auto;font-weight:600}
+.nav-sep{height:1px;background:var(--border);margin:12px 0}
+.nav-item.admin-only{display:none}
+
+/* CONTENT */
+.content{flex:1;padding:20px;min-width:0}
+.page{display:none}
+.page.visible{display:block}
+
+/* STAT CARDS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:var(--white);border-radius:var(--r);padding:16px;border:1px solid var(--border);box-shadow:var(--sh)}
+.stat-label{font-size:0.7rem;font-weight:600;color:var(--text-s);text-transform:uppercase;letter-spacing:0.04em}
+.stat-val{font-family:var(--fd);font-size:1.6rem;color:var(--navy);font-weight:700;margin-top:4px}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap}
+.toolbar h3{font-family:var(--fd);font-size:1.1rem;color:var(--navy)}
+.toolbar-r{display:flex;gap:8px;align-items:center}
+.search-input{font-family:var(--f);font-size:0.82rem;padding:8px 14px;border:1.5px solid var(--border);border-radius:8px;width:220px;outline:none;background:var(--white)}
+.search-input:focus{border-color:var(--gold)}
+.btn-add{font-family:var(--f);font-size:0.8rem;font-weight:600;padding:8px 18px;border-radius:8px;border:none;cursor:pointer;background:var(--gold);color:var(--white);transition:background 0.2s}
+.btn-add:hover{background:#B8891F}
+
+/* TABLE */
+.tbl-wrap{background:var(--white);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--navy)}
+th{font-size:0.7rem;font-weight:600;color:var(--white);text-align:left;padding:10px 14px;text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap}
+td{font-size:0.82rem;padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover{background:rgba(200,152,46,0.02)}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;font-size:0.68rem;font-weight:600}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+.b-active{background:var(--succ-bg);color:var(--succ)}
+.b-prospect{background:var(--info-bg);color:var(--info)}
+.b-pending{background:var(--warn-bg);color:var(--warn)}
+.b-new{background:var(--warn-bg);color:var(--warn)}
+.b-contacted{background:var(--info-bg);color:var(--info)}
+.b-sold{background:var(--succ-bg);color:var(--succ)}
+.b-lost{background:var(--err-bg);color:var(--err)}
+.link-btn{background:none;border:none;color:var(--info);font-weight:600;font-size:0.8rem;cursor:pointer;font-family:var(--f);padding:0}
+.name-bold{font-weight:600;color:var(--navy)}
+.agent-num{color:var(--gold);font-weight:600;font-size:0.8rem}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(11,31,63,0.45);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(3px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:520px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(11,31,63,0.15);animation:mIn 0.25s ease}
+@keyframes mIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-hd{background:var(--navy);padding:18px 24px;border-radius:16px 16px 0 0;display:flex;align-items:center;justify-content:space-between}
+.modal-hd h3{font-family:var(--fd);font-size:1rem;color:var(--white)}
+.modal-x{background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.3rem;cursor:pointer;line-height:1}
+.modal-x:hover{color:var(--white)}
+.modal-bd{padding:24px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg .full{grid-column:1/-1}
+.fg label{font-size:0.76rem;font-weight:600;color:var(--slate);display:block;margin-bottom:3px}
+.fg label .req{color:var(--err)}
+.fg input,.fg select,.fg textarea{width:100%;font-family:var(--f);font-size:0.85rem;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;outline:none;background:var(--bg);transition:border 0.2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--gold)}
+.fg textarea{resize:vertical;min-height:70px}
+.modal-submit{width:100%;padding:12px;border-radius:8px;border:none;background:var(--gold);color:var(--white);font-family:var(--f);font-size:0.88rem;font-weight:600;cursor:pointer;margin-top:8px;transition:background 0.2s}
+.modal-submit:hover{background:#B8891F}
+
+/* ALERT */
+.alert{padding:12px 16px;border-radius:var(--r);font-size:0.82rem;font-weight:500;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.alert-warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn)}
+.alert-info{background:var(--info-bg);color:var(--info);border:1px solid var(--info)}
+
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--text-s)}
+.empty h4{font-family:var(--fd);color:var(--navy);margin-bottom:6px}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 24px;border-radius:8px;font-size:0.82rem;font-weight:600;font-family:var(--f);z-index:999;box-shadow:var(--sh-md);color:var(--white);animation:mIn 0.25s ease}
+.toast.succ{background:var(--succ)}
+.toast.err{background:var(--err)}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .fg{grid-template-columns:1fr}
+  .topbar-user{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════ LOGIN ═══════ -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="logo">365</div>
+    <h2>Agent365Pro</h2>
+    <p>Sign in to your portal</p>
+    <div class="login-err" id="loginErr">Invalid credentials</div>
+    <input type="email" id="loginEmail" placeholder="Email address" autofocus>
+    <input type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn" onclick="doLogin()">Sign In</button>
+    <p style="font-size:0.7rem;color:var(--text-s);margin-top:16px">Our 365 Financial Solution LLC</p>
+  </div>
+</div>
+
+<!-- ═══════ APP ═══════ -->
+<div class="app" id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-l">
+      <div class="topbar-logo">365</div>
+      <span class="topbar-name">Agent365Pro</span>
+      <span class="topbar-badge badge-agent" id="roleBadge">Agent</span>
+    </div>
+    <div class="topbar-r">
+      <span class="topbar-user" id="userName"></span>
+      <div class="topbar-avatar" id="userAvatar">EC</div>
+      <button class="btn-logout" onclick="doLogout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="nav-item active" data-page="dashboard" onclick="nav('dashboard')">Dashboard</div>
+      <div class="nav-item admin-only" data-page="agents" onclick="nav('agents')">Agents</div>
+      <div class="nav-item" data-page="clients" onclick="nav('clients')">Clients</div>
+      <div class="nav-item" data-page="leads" onclick="nav('leads')">Leads <span class="nav-badge" id="leadBadge" style="display:none">0</span></div>
+      <div class="nav-sep"></div>
+      <div class="nav-item" onclick="doLogout()">Sign Out</div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page visible" id="pg-dashboard">
+        <div class="stats" id="dashStats"></div>
+        <div id="dashAlerts"></div>
+        <div class="toolbar"><h3 id="dashTableTitle">Recent clients</h3></div>
+        <div class="tbl-wrap"><table><thead><tr>
+          <th>Name</th><th>Phone</th><th>Product</th><th>Status</th><th>Added</th><th></th>
+        </tr></thead><tbody id="dashTable"></tbody></table></div>
+      </div>
+
+      <!-- AGENTS (admin only) -->
+      <div class="page" id="pg-agents">
+        <div class="toolbar">
+          <h3>Agent Roster</h3>
+          <div class="toolbar-r">
+            <input class="search-input" placeholder="Search agents..." id="agentSearch" oninput="renderAgents()">
+            <button class="btn-add" onclick="openModal('addAgent')">+ Add Agent</button>
+          </div>
+        </div>
+        <div class="tbl-wrap"><table><thead><tr>
+          <th>Agent #</th><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th></th>
+        </tr></thead><tbody id="agentTable"></tbody></table>
+        <div class="empty" id="agentEmpty" style="display:none"><h4>No agents yet</h4><p>Add your first agent to get started.</p></div>
+        </div>
+      </div>
+
+      <!-- CLIENTS -->
+      <div class="page" id="pg-clients">
+        <div class="toolbar">
+          <h3 id="clientsTitle">My Clients</h3>
+          <div class="toolbar-r">
+            <input class="search-input" placeholder="Search clients..." id="clientSearch" oninput="renderClients()">
+            <button class="btn-add" onclick="openModal('addClient')">+ Add Client</button>
+          </div>
+        </div>
+        <div class="tbl-wrap"><table><thead><tr>
+          <th>Name</th><th>Email</th><th>Phone</th><th>Product Interest</th><th>Status</th><th>Added</th><th></th>
+        </tr></thead><tbody id="clientTable"></tbody></table>
+        <div class="empty" id="clientEmpty" style="display:none"><h4>No clients yet</h4><p>Add your first client to start building your book of business.</p></div>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div class="page" id="pg-leads">
+        <div class="toolbar">
+          <h3 id="leadsTitle">My Leads</h3>
+          <div class="toolbar-r">
+            <input class="search-input" placeholder="Search leads..." id="leadSearch" oninput="renderLeads()">
+          </div>
+        </div>
+        <div id="leadAlert"></div>
+        <div class="tbl-wrap"><table><thead><tr>
+          <th>Name</th><th>Email</th><th>Phone</th><th>Source</th><th>Status</th><th>Assigned</th><th></th>
+        </tr></thead><tbody id="leadTable"></tbody></table>
+        <div class="empty" id="leadEmpty" style="display:none"><h4>No leads assigned</h4><p>Leads will appear here when they're assigned to you.</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODALS ═══════ -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="modalTitle">Add</h3>
+      <button class="modal-x" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-bd" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- ═══════ SCRIPTS ═══════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ─── CONFIG ───
+const SB_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTY1MTEsImV4cCI6MjA4OTE5MjUxMX0.e8fqOaSJWBrAElKq30s293k6jpkQI0YhxdqOL6bxuVM';
+let sb = null;
+try { sb = window.supabase.createClient(SB_URL, SB_KEY); } catch(e) {}
+
+// ─── STATE ───
+let currentUser = null; // { id, email, role, agent_number, first_name, last_name }
+let agentsData = [];
+let clientsData = [];
+let leadsData = [];
+
+// ─── AUTH ───
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  if (!email || !pass) { showLoginErr('Please enter email and password.'); return; }
+
+  // Check agents table for credentials
+  if (sb) {
+    try {
+      const { data, error } = await sb.from('agents').select('*').eq('email', email).single();
+      if (error || !data) { showLoginErr('Account not found. Contact your agency principal.'); return; }
+      // Simple password check: use agent_number as default password (agents should change)
+      // For now: admin uses "Our365Admin", agents use their agent_number
+      const validPass = (data.role === 'admin' && pass === 'Our365Admin') ||
+                        (data.role === 'agent' && pass === data.agent_number) ||
+                        pass === data.agent_number; // fallback
+      if (!validPass) { showLoginErr('Incorrect password.'); return; }
+
+      currentUser = {
+        id: data.id,
+        email: data.email,
+        role: data.role || 'agent',
+        agent_number: data.agent_number,
+        first_name: data.first_name,
+        last_name: data.last_name,
+      };
+      sessionStorage.setItem('crm_user', JSON.stringify(currentUser));
+      showApp();
+      return;
+    } catch(e) { console.warn('Login error:', e); }
+  }
+  showLoginErr('Unable to connect. Please try again.');
+}
+
+function showLoginErr(msg) {
+  const el = document.getElementById('loginErr');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogout() {
+  currentUser = null;
+  sessionStorage.removeItem('crm_user');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+}
+
+// Check session
+const saved = sessionStorage.getItem('crm_user');
+if (saved) { currentUser = JSON.parse(saved); showApp(); }
+
+// ─── SHOW APP ───
+async function showApp() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  // Update UI for role
+  const isAdmin = currentUser.role === 'admin';
+  const badge = document.getElementById('roleBadge');
+  badge.textContent = isAdmin ? 'Admin' : 'Agent';
+  badge.className = 'topbar-badge ' + (isAdmin ? 'badge-admin' : 'badge-agent');
+
+  document.getElementById('userName').textContent = currentUser.first_name + ' ' + currentUser.last_name;
+  const initials = (currentUser.first_name[0] || '') + (currentUser.last_name[0] || '');
+  document.getElementById('userAvatar').textContent = initials.toUpperCase();
+
+  // Show admin nav items
+  document.querySelectorAll('.admin-only').forEach(el => {
+    el.style.display = isAdmin ? 'flex' : 'none';
+  });
+
+  // Update titles
+  document.getElementById('clientsTitle').textContent = isAdmin ? 'All Clients' : 'My Clients';
+  document.getElementById('leadsTitle').textContent = isAdmin ? 'All Leads' : 'My Leads';
+  document.getElementById('dashTableTitle').textContent = isAdmin ? 'Recent clients (all agents)' : 'My recent clients';
+
+  // Load data
+  await loadData();
+  nav('dashboard');
+}
+
+// ─── LOAD DATA ───
+async function loadData() {
+  if (!sb) return;
+  try {
+    // Agents
+    const { data: a } = await sb.from('agents').select('*').order('created_at', { ascending: false });
+    agentsData = a || [];
+
+    // Clients
+    const isAdmin = currentUser.role === 'admin';
+    let cq = sb.from('clients').select('*').order('created_at', { ascending: false });
+    if (!isAdmin) cq = cq.eq('agent_id', currentUser.id);
+    const { data: c } = await cq;
+    clientsData = c || [];
+
+    // Leads from onboarding_submissions (for now)
+    let lq = sb.from('onboarding_submissions').select('*').order('submitted_at', { ascending: false });
+    const { data: l } = await lq;
+    leadsData = []; // placeholder until lead system integrated
+
+  } catch(e) { console.warn('Load error:', e); }
+}
+
+// ─── NAVIGATION ───
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('pg-' + page).classList.add('visible');
+  const navEl = document.querySelector(`.nav-item[data-page="${page}"]`);
+  if (navEl) navEl.classList.add('active');
+
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'agents') renderAgents();
+  if (page === 'clients') renderClients();
+  if (page === 'leads') renderLeads();
+}
+
+// ─── DASHBOARD ───
+function renderDashboard() {
+  const isAdmin = currentUser.role === 'admin';
+  const activeAgents = agentsData.filter(a => a.status === 'active').length;
+  const totalClients = clientsData.length;
+  const prospects = clientsData.filter(c => c.status === 'prospect').length;
+
+  let statsHtml = '';
+  if (isAdmin) {
+    statsHtml = `
+      <div class="stat"><div class="stat-label">Active agents</div><div class="stat-val">${activeAgents}</div></div>
+      <div class="stat"><div class="stat-label">Total clients</div><div class="stat-val">${totalClients}</div></div>
+      <div class="stat"><div class="stat-label">Prospects</div><div class="stat-val">${prospects}</div></div>
+      <div class="stat"><div class="stat-label">Open leads</div><div class="stat-val">${leadsData.length}</div></div>
+    `;
+  } else {
+    statsHtml = `
+      <div class="stat"><div class="stat-label">My clients</div><div class="stat-val">${totalClients}</div></div>
+      <div class="stat"><div class="stat-label">Prospects</div><div class="stat-val">${prospects}</div></div>
+      <div class="stat"><div class="stat-label">Active policies</div><div class="stat-val">0</div></div>
+      <div class="stat"><div class="stat-label">Open leads</div><div class="stat-val">${leadsData.length}</div></div>
+    `;
+  }
+  document.getElementById('dashStats').innerHTML = statsHtml;
+
+  // Recent clients table
+  const recent = clientsData.slice(0, 5);
+  if (recent.length === 0) {
+    document.getElementById('dashTable').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-s)">No clients yet. Click "Clients" to add your first one.</td></tr>';
+  } else {
+    document.getElementById('dashTable').innerHTML = recent.map(c => `<tr>
+      <td class="name-bold">${esc(c.first_name)} ${esc(c.last_name)}</td>
+      <td style="color:var(--text-s)">${esc(c.phone || '')}</td>
+      <td style="color:var(--text-s)">${esc(c.product_interest || '—')}</td>
+      <td><span class="badge b-${c.status || 'prospect'}">${ucfirst(c.status || 'prospect')}</span></td>
+      <td style="color:var(--text-s);font-size:0.78rem">${fmtDate(c.created_at)}</td>
+      <td><button class="link-btn" onclick="viewClient('${c.id}')">View</button></td>
+    </tr>`).join('');
+  }
+}
+
+// ─── AGENTS TABLE ───
+function renderAgents() {
+  const search = (document.getElementById('agentSearch')?.value || '').toLowerCase();
+  let filtered = agentsData.filter(a => a.role !== 'admin');
+  if (search) filtered = filtered.filter(a => (a.first_name + ' ' + a.last_name + ' ' + a.agent_number + ' ' + a.email).toLowerCase().includes(search));
+
+  const empty = document.getElementById('agentEmpty');
+  if (filtered.length === 0) { empty.style.display = 'block'; } else { empty.style.display = 'none'; }
+
+  document.getElementById('agentTable').innerHTML = filtered.map(a => `<tr>
+    <td class="agent-num">${esc(a.agent_number || '—')}</td>
+    <td class="name-bold">${esc(a.first_name)} ${esc(a.last_name)}</td>
+    <td style="color:var(--text-s)">${esc(a.email)}</td>
+    <td style="color:var(--text-s)">${esc(a.phone || '—')}</td>
+    <td><span class="badge b-${a.status || 'active'}">${ucfirst(a.status || 'active')}</span></td>
+    <td><button class="link-btn" onclick="viewAgent('${a.id}')">View</button></td>
+  </tr>`).join('');
+}
+
+// ─── CLIENTS TABLE ───
+function renderClients() {
+  const search = (document.getElementById('clientSearch')?.value || '').toLowerCase();
+  let filtered = clientsData;
+  if (search) filtered = filtered.filter(c => (c.first_name + ' ' + c.last_name + ' ' + c.email + ' ' + c.phone).toLowerCase().includes(search));
+
+  const empty = document.getElementById('clientEmpty');
+  if (filtered.length === 0) { empty.style.display = 'block'; } else { empty.style.display = 'none'; }
+
+  document.getElementById('clientTable').innerHTML = filtered.map(c => `<tr>
+    <td class="name-bold">${esc(c.first_name)} ${esc(c.last_name)}</td>
+    <td style="color:var(--text-s)">${esc(c.email || '—')}</td>
+    <td style="color:var(--text-s)">${esc(c.phone || '—')}</td>
+    <td style="color:var(--text-s)">${esc(c.product_interest || '—')}</td>
+    <td><span class="badge b-${c.status || 'prospect'}">${ucfirst(c.status || 'prospect')}</span></td>
+    <td style="color:var(--text-s);font-size:0.78rem">${fmtDate(c.created_at)}</td>
+    <td><button class="link-btn" onclick="viewClient('${c.id}')">Edit</button></td>
+  </tr>`).join('');
+}
+
+// ─── LEADS TABLE ───
+function renderLeads() {
+  const empty = document.getElementById('leadEmpty');
+  if (leadsData.length === 0) {
+    empty.style.display = 'block';
+    document.getElementById('leadTable').innerHTML = '';
+    document.getElementById('leadAlert').innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+}
+
+// ─── MODALS ───
+function openModal(type, id) {
+  const title = document.getElementById('modalTitle');
+  const body = document.getElementById('modalBody');
+  document.getElementById('modalBg').classList.add('open');
+
+  if (type === 'addAgent') {
+    title.textContent = 'Add New Agent';
+    body.innerHTML = `
+      <div class="fg">
+        <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" id="mAgentFirst"></div>
+        <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" id="mAgentLast"></div>
+        <div class="form-group"><label>Email <span class="req">*</span></label><input type="email" id="mAgentEmail"></div>
+        <div class="form-group"><label>Phone</label><input type="tel" id="mAgentPhone"></div>
+        <div class="form-group"><label>Agent Number <span class="req">*</span></label><input type="text" id="mAgentNum" placeholder="e.g., A365-0001"></div>
+        <div class="form-group"><label>Role</label>
+          <select id="mAgentRole"><option value="agent">Agent</option><option value="admin">Admin</option></select>
+        </div>
+        <div class="full" style="background:var(--gold-l);padding:12px;border-radius:8px;margin-top:4px">
+          <p style="font-size:0.78rem;color:var(--navy)"><strong>Default password:</strong> The agent's Agent Number (e.g., A365-0001). They should change it after first login.</p>
+        </div>
+      </div>
+      <button class="modal-submit" onclick="saveAgent()">Add Agent</button>
+    `;
+  }
+
+  if (type === 'addClient') {
+    title.textContent = 'Add New Client';
+    const agentOptions = currentUser.role === 'admin'
+      ? agentsData.filter(a => a.role !== 'admin').map(a => `<option value="${a.id}">${a.first_name} ${a.last_name} (${a.agent_number})</option>`).join('')
+      : `<option value="${currentUser.id}">${currentUser.first_name} ${currentUser.last_name}</option>`;
+
+    body.innerHTML = `
+      <div class="fg">
+        <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" id="mClientFirst"></div>
+        <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" id="mClientLast"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="mClientEmail"></div>
+        <div class="form-group"><label>Phone <span class="req">*</span></label><input type="tel" id="mClientPhone"></div>
+        <div class="form-group full"><label>Address</label><input type="text" id="mClientAddr"></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="mClientDob"></div>
+        <div class="form-group"><label>Product Interest</label>
+          <select id="mClientProduct">
+            <option value="">Select</option>
+            <option value="Term Life">Term Life</option>
+            <option value="Whole Life">Whole Life</option>
+            <option value="Universal Life">Universal Life</option>
+            <option value="Health (ACA)">Health (ACA)</option>
+            <option value="Medicare Supplement">Medicare Supplement</option>
+            <option value="Medicare Advantage">Medicare Advantage</option>
+            <option value="Fixed Annuity">Fixed Annuity</option>
+            <option value="FIA">Fixed Indexed Annuity</option>
+            <option value="Final Expense">Final Expense</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Status</label>
+          <select id="mClientStatus">
+            <option value="prospect">Prospect</option>
+            <option value="contacted">Contacted</option>
+            <option value="quoted">Quoted</option>
+            <option value="active">Active Client</option>
+          </select>
+        </div>
+        ${currentUser.role === 'admin' ? `<div class="form-group full"><label>Assign to Agent <span class="req">*</span></label><select id="mClientAgent">${agentOptions}</select></div>` : ''}
+        <div class="form-group full"><label>Notes</label><textarea id="mClientNotes" placeholder="Any additional notes..."></textarea></div>
+      </div>
+      <button class="modal-submit" onclick="saveClient()">Save Client</button>
+    `;
+  }
+
+  if (type === 'editClient') {
+    const c = clientsData.find(x => x.id === id);
+    if (!c) return;
+    title.textContent = 'Edit Client';
+    body.innerHTML = `
+      <div class="fg">
+        <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" id="mClientFirst" value="${esc(c.first_name)}"></div>
+        <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" id="mClientLast" value="${esc(c.last_name)}"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="mClientEmail" value="${esc(c.email || '')}"></div>
+        <div class="form-group"><label>Phone <span class="req">*</span></label><input type="tel" id="mClientPhone" value="${esc(c.phone || '')}"></div>
+        <div class="form-group full"><label>Address</label><input type="text" id="mClientAddr" value="${esc(c.address || '')}"></div>
+        <div class="form-group"><label>Date of Birth</label><input type="date" id="mClientDob" value="${c.dob || ''}"></div>
+        <div class="form-group"><label>Product Interest</label>
+          <select id="mClientProduct">
+            <option value="">Select</option>
+            <option value="Term Life" ${c.product_interest==='Term Life'?'selected':''}>Term Life</option>
+            <option value="Whole Life" ${c.product_interest==='Whole Life'?'selected':''}>Whole Life</option>
+            <option value="Universal Life" ${c.product_interest==='Universal Life'?'selected':''}>Universal Life</option>
+            <option value="Health (ACA)" ${c.product_interest==='Health (ACA)'?'selected':''}>Health (ACA)</option>
+            <option value="Medicare Supplement" ${c.product_interest==='Medicare Supplement'?'selected':''}>Medicare Supplement</option>
+            <option value="Medicare Advantage" ${c.product_interest==='Medicare Advantage'?'selected':''}>Medicare Advantage</option>
+            <option value="Fixed Annuity" ${c.product_interest==='Fixed Annuity'?'selected':''}>Fixed Annuity</option>
+            <option value="FIA" ${c.product_interest==='FIA'?'selected':''}>Fixed Indexed Annuity</option>
+            <option value="Final Expense" ${c.product_interest==='Final Expense'?'selected':''}>Final Expense</option>
+            <option value="Other" ${c.product_interest==='Other'?'selected':''}>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Status</label>
+          <select id="mClientStatus">
+            <option value="prospect" ${c.status==='prospect'?'selected':''}>Prospect</option>
+            <option value="contacted" ${c.status==='contacted'?'selected':''}>Contacted</option>
+            <option value="quoted" ${c.status==='quoted'?'selected':''}>Quoted</option>
+            <option value="active" ${c.status==='active'?'selected':''}>Active Client</option>
+          </select>
+        </div>
+        <div class="form-group full"><label>Notes</label><textarea id="mClientNotes">${esc(c.notes || '')}</textarea></div>
+      </div>
+      <button class="modal-submit" onclick="updateClient('${c.id}')">Update Client</button>
+    `;
+  }
+}
+
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); }
+
+// ─── SAVE AGENT ───
+async function saveAgent() {
+  const first = document.getElementById('mAgentFirst').value.trim();
+  const last = document.getElementById('mAgentLast').value.trim();
+  const email = document.getElementById('mAgentEmail').value.trim().toLowerCase();
+  const phone = document.getElementById('mAgentPhone').value.trim();
+  const num = document.getElementById('mAgentNum').value.trim();
+  const role = document.getElementById('mAgentRole').value;
+
+  if (!first || !last || !email || !num) { toast('Please fill in all required fields.', 'err'); return; }
+
+  const id = 'agent_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+
+  if (sb) {
+    const { error } = await sb.from('agents').insert({
+      id, agent_number: num, email, first_name: first, last_name: last, phone, role, status: 'active'
+    });
+    if (error) { toast('Error: ' + (error.message || 'Could not save'), 'err'); return; }
+  }
+
+  closeModal();
+  toast(first + ' ' + last + ' added!', 'succ');
+  await loadData();
+  renderAgents();
+}
+
+// ─── SAVE CLIENT ───
+async function saveClient() {
+  const first = document.getElementById('mClientFirst').value.trim();
+  const last = document.getElementById('mClientLast').value.trim();
+  const phone = document.getElementById('mClientPhone').value.trim();
+
+  if (!first || !last || !phone) { toast('Please fill in name and phone.', 'err'); return; }
+
+  const agentId = currentUser.role === 'admin'
+    ? document.getElementById('mClientAgent').value
+    : currentUser.id;
+
+  const id = 'client_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+
+  if (sb) {
+    const { error } = await sb.from('clients').insert({
+      id, agent_id: agentId,
+      first_name: first, last_name: last,
+      email: document.getElementById('mClientEmail').value.trim(),
+      phone,
+      address: document.getElementById('mClientAddr').value.trim(),
+      dob: document.getElementById('mClientDob').value,
+      product_interest: document.getElementById('mClientProduct').value,
+      status: document.getElementById('mClientStatus').value,
+      notes: document.getElementById('mClientNotes').value.trim(),
+    });
+    if (error) { toast('Error: ' + (error.message || 'Could not save'), 'err'); return; }
+  }
+
+  closeModal();
+  toast(first + ' ' + last + ' added!', 'succ');
+  await loadData();
+  renderClients();
+  renderDashboard();
+}
+
+// ─── UPDATE CLIENT ───
+async function updateClient(id) {
+  const first = document.getElementById('mClientFirst').value.trim();
+  const last = document.getElementById('mClientLast').value.trim();
+
+  if (!first || !last) { toast('Name is required.', 'err'); return; }
+
+  if (sb) {
+    const { error } = await sb.from('clients').update({
+      first_name: first, last_name: last,
+      email: document.getElementById('mClientEmail').value.trim(),
+      phone: document.getElementById('mClientPhone').value.trim(),
+      address: document.getElementById('mClientAddr').value.trim(),
+      dob: document.getElementById('mClientDob').value,
+      product_interest: document.getElementById('mClientProduct').value,
+      status: document.getElementById('mClientStatus').value,
+      notes: document.getElementById('mClientNotes').value.trim(),
+      updated_at: new Date().toISOString(),
+    }).eq('id', id);
+    if (error) { toast('Error: ' + error.message, 'err'); return; }
+  }
+
+  // Update local data
+  const idx = clientsData.findIndex(c => c.id === id);
+  if (idx >= 0) {
+    clientsData[idx].first_name = first;
+    clientsData[idx].last_name = last;
+    clientsData[idx].status = document.getElementById('mClientStatus').value;
+  }
+
+  closeModal();
+  toast('Client updated!', 'succ');
+  renderClients();
+  renderDashboard();
+}
+
+function viewClient(id) { openModal('editClient', id); }
+function viewAgent(id) { /* future: agent detail panel */ toast('Agent detail coming in Phase 2', 'succ'); }
+
+// ─── UTILITIES ───
+function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+function ucfirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function fmtDate(d) { if (!d) return '—'; return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+
+function toast(msg, type) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+</script>
+</body>
+</html>
