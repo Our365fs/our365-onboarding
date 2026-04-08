@@ -872,21 +872,6 @@ async function submitOnboarding() {
         });
         if (error) console.warn('[SUPABASE] Insert error:', error);
         else console.log('[SUPABASE] Saved:', confNum);
-
-        // Also create agent record in CRM
-        try {
-          await sbClient.from('agents').insert({
-            id: 'agent_' + Date.now() + '_' + Math.random().toString(36).slice(2,6),
-            agent_number: agentNumber,
-            email: submission.email.toLowerCase(),
-            first_name: submission.firstName,
-            last_name: submission.lastName,
-            phone: submission.phone,
-            role: 'agent',
-            status: 'pending',
-          });
-          console.log('[SUPABASE] Agent record created for CRM');
-        } catch (ae) { console.warn('[SUPABASE] Agent record failed:', ae); }
       } catch (e) { console.warn('[SUPABASE] Save failed:', e); }
     }
 
@@ -1046,4 +1031,3 @@ document.getElementById('phone').addEventListener('input', function() {
 </script>
 </body>
 </html>
-
