@@ -1,1071 +1,812 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Agent Onboarding | Our 365 Financial Solution</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 <style>
-/* ─── Reset & Variables ─── */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --navy:#1A3A1A; --navy-deep:#0F2410; --gold:#C9A84C; --gold-light:#F5EDD6;
-  --green:#2D7A4F; --green-light:#EEF6EE; --slate:#4A5568; --text:#1A1A2E;
-  --text-sec:#5A6275; --border:#C8DEC8; --border-lt:#E2F0E2; --bg:#F4F7F4;
-  --white:#FFFFFF; --error:#DC2626; --error-bg:#FEF2F2;
-  --success:#15803D; --success-bg:#DCFCE7;
-  --shadow:0 2px 8px rgba(15,36,16,.07); --shadow-md:0 6px 20px rgba(15,36,16,.11);
-  --shadow-lg:0 16px 48px rgba(15,36,16,.16);
-  --radius:12px; --font:'DM Sans',system-ui,sans-serif;
-  --font-display:'Playfair Display',Georgia,serif;
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F3F7F4;color:#1A1A1A;min-height:100vh}
+.top-bar{background:#325838;padding:14px 24px;display:flex;align-items:center;gap:12px}
+.top-bar .logo{color:#C9A84C;font-size:1.5rem;font-weight:800}
+.top-bar .name{color:#fff;font-size:1rem;font-weight:600}
+.top-bar .sub{color:#A8C5AA;font-size:0.8rem}
+.container{max-width:720px;margin:32px auto;padding:0 16px 80px}
+.progress-bar{background:#fff;border-radius:12px;padding:20px 24px;margin-bottom:24px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.progress-label{font-size:0.82rem;color:#6B7280;margin-bottom:8px}
+.progress-steps{display:flex;gap:0;position:relative}
+.progress-steps::before{content:'';position:absolute;top:14px;left:14px;right:14px;height:2px;background:#E5E7EB;z-index:0}
+.step-dot{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative;z-index:1}
+.step-dot .dot{width:28px;height:28px;border-radius:50%;background:#E5E7EB;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#6B7280;transition:.3s}
+.step-dot .dot.active{background:#325838;color:#fff}
+.step-dot .dot.done{background:#C9A84C;color:#325838}
+.step-dot span{font-size:0.68rem;color:#6B7280;text-align:center}
+.card{background:#fff;border-radius:14px;padding:28px;box-shadow:0 1px 6px rgba(0,0,0,.08);margin-bottom:20px}
+.card h2{color:#325838;font-size:1.2rem;font-weight:700;margin-bottom:6px}
+.card .subtitle{color:#6B7280;font-size:0.84rem;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:540px){.grid{grid-template-columns:1fr}}
+.full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:0.82rem;font-weight:600;color:#374151}
+.field label .req{color:#CC2222;margin-left:2px}
+.field input,.field select,.field textarea{
+  padding:10px 13px;border:1.5px solid #D1D5DB;border-radius:8px;
+  font-size:0.92rem;color:#111827;background:#F9FAFB;
+  transition:border-color .2s,box-shadow .2s;font-family:inherit
 }
-html{font-size:16px;scroll-behavior:smooth}
-body{font-family:var(--font);color:var(--text);background:var(--bg);
-     min-height:100vh;-webkit-font-smoothing:antialiased}
+.field input:focus,.field select:focus,.field textarea:focus{
+  outline:none;border-color:#325838;background:#fff;
+  box-shadow:0 0 0 3px rgba(50,88,56,.12)
+}
+.field .hint{font-size:0.74rem;color:#6B7280}
+.field .err{font-size:0.74rem;color:#CC2222;display:none}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-color:#CC2222}
+.field.invalid .err{display:block}
+.radio-group{display:flex;gap:16px;flex-wrap:wrap}
+.radio-group label{display:flex;align-items:center;gap:7px;font-size:0.88rem;cursor:pointer;padding:8px 14px;border:1.5px solid #D1D5DB;border-radius:8px;transition:.2s}
+.radio-group label:has(input:checked){border-color:#325838;background:#E8F0E9}
+.radio-group input{accent-color:#325838}
+.check-group{display:flex;flex-direction:column;gap:8px}
+.check-group label{display:flex;align-items:center;gap:8px;font-size:0.88rem;cursor:pointer;padding:7px 10px;border-radius:7px;transition:.15s}
+.check-group label:hover{background:#F3F7F4}
+.check-group input{accent-color:#325838;width:16px;height:16px}
+.info-box{background:#EFF6FF;border:1px solid #93C5FD;border-radius:8px;padding:12px 15px;font-size:0.82rem;color:#1E40AF}
+.warn-box{background:#FFFBEB;border:1px solid #FCD34D;border-radius:8px;padding:12px 15px;font-size:0.82rem;color:#92400E}
+.secure-box{background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:12px 15px;font-size:0.82rem;color:#166534}
 
-/* ─── Header ─── */
-.header{background:var(--navy-deep);padding:20px 24px;
-        display:flex;align-items:center;justify-content:space-between}
-.logo{display:flex;align-items:center;gap:12px}
-.logo-icon{width:44px;height:44px;background:var(--gold);border-radius:10px;
-           display:flex;align-items:center;justify-content:center;
-           font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--navy-deep)}
-.logo-text h2{font-family:var(--font-display);font-size:1rem;color:var(--white);font-weight:700}
-.logo-text span{font-size:.68rem;color:var(--gold);text-transform:uppercase;
-                letter-spacing:.07em;font-weight:500}
-.header-badge{display:flex;align-items:center;gap:6px;
-              background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);
-              color:var(--gold);font-size:.75rem;font-weight:600;
-              padding:6px 14px;border-radius:20px}
-.header-badge::before{content:'';width:7px;height:7px;background:var(--gold);
-                       border-radius:50%;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* States grid */
+.states-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));
+  gap:5px;max-height:260px;overflow-y:auto;
+  border:1.5px solid #D1D5DB;border-radius:8px;padding:12px;background:#F9FAFB
+}
+.states-grid label{display:flex;align-items:center;gap:7px;font-size:0.8rem;color:#374151;cursor:pointer;padding:3px 5px;border-radius:5px;transition:.12s}
+.states-grid label:hover{background:#E8F0E9}
+.states-grid input[type=checkbox]{accent-color:#325838;width:14px;height:14px}
+.states-ctrl{display:flex;gap:8px;margin-bottom:8px}
+.states-ctrl button{font-size:0.76rem;padding:4px 12px;border-radius:6px;border:1px solid #325838;background:transparent;color:#325838;cursor:pointer;font-weight:600}
+.states-ctrl button:hover{background:#E8F0E9}
 
-/* ─── Layout ─── */
-.container{max-width:760px;margin:0 auto;padding:40px 24px 80px}
-.form-card{background:var(--white);border-radius:20px;
-           box-shadow:var(--shadow-lg);overflow:hidden}
+/* Signature */
+#sigCanvas{
+  width:100%;height:150px;border:2px dashed #D1D5DB;border-radius:8px;
+  background:#fff;cursor:crosshair;display:block;touch-action:none
+}
+#sigCanvas.signed{border-color:#325838;border-style:solid}
+#sigCanvas.error{border-color:#CC2222}
+.sig-status{font-size:0.78rem;color:#6B7280;margin-top:5px}
 
-/* ─── Progress Bar ─── */
-.progress-wrap{padding:28px 32px 0}
-.progress-top{display:flex;justify-content:space-between;align-items:center;
-              margin-bottom:12px}
-.progress-label{font-size:.78rem;font-weight:700;color:var(--slate);
-                text-transform:uppercase;letter-spacing:.07em}
-.progress-step{font-size:.78rem;color:var(--text-sec)}
-.progress-bar{height:5px;background:var(--border-lt);border-radius:3px;overflow:hidden}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--gold));
-               border-radius:3px;transition:width .4s ease}
-.step-dots{display:flex;gap:0;margin-top:16px;border-bottom:1px solid var(--border-lt);
-           padding-bottom:0}
-.step-dot{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;
-          padding-bottom:14px;border-bottom:3px solid transparent;
-          font-size:.72rem;font-weight:600;color:var(--text-sec);transition:.2s}
-.step-dot.done{color:var(--success);border-bottom-color:var(--success)}
-.step-dot.active{color:var(--navy);border-bottom-color:var(--gold)}
-.step-dot-num{width:24px;height:24px;border-radius:50%;
-              display:flex;align-items:center;justify-content:center;
-              font-size:.7rem;font-weight:800;background:var(--border-lt);color:var(--text-sec)}
-.step-dot.done .step-dot-num{background:var(--success);color:#fff}
-.step-dot.active .step-dot-num{background:var(--gold);color:#fff}
+/* Nav buttons */
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
+.btn{padding:12px 24px;border-radius:9px;font-size:0.95rem;font-weight:700;cursor:pointer;border:none;transition:.2s}
+.btn-back{background:#F3F4F6;color:#374151}
+.btn-back:hover{background:#E5E7EB}
+.btn-next{background:#325838;color:#fff;min-width:180px}
+.btn-next:hover{background:#1E3A2F}
+.btn-next:disabled{background:#9CA3AF;cursor:not-allowed}
+.btn-submit{background:#C9A84C;color:#325838;min-width:200px}
+.btn-submit:hover{background:#B8962E}
 
-/* ─── Step panel ─── */
-.step-panel{display:none;padding:28px 32px 32px;animation:fadeIn .25s ease}
+/* Success */
+#successScreen{display:none;text-align:center;padding:40px 20px}
+.success-icon{width:72px;height:72px;background:#E8F0E9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem}
+#successScreen h2{color:#325838;font-size:1.6rem;margin-bottom:10px}
+#successScreen p{color:#6B7280;font-size:0.95rem;margin-bottom:6px}
+.conf-num{font-size:1.1rem;font-weight:700;color:#C9A84C;margin:16px 0}
+.next-steps{text-align:left;background:#F3F7F4;border-radius:10px;padding:20px;margin-top:20px}
+.next-steps h4{color:#325838;margin-bottom:12px}
+.next-steps li{font-size:0.88rem;color:#374151;margin-bottom:8px;line-height:1.5}
+
+/* Hide/show steps */
+.step-panel{display:none}
 .step-panel.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.step-title{font-family:var(--font-display);font-size:1.25rem;color:var(--navy);
-            margin-bottom:4px}
-.step-sub{font-size:.85rem;color:var(--text-sec);line-height:1.5;margin-bottom:24px}
-
-/* ─── Form Elements ─── */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.form-grid .full{grid-column:1/-1}
-.form-group{display:flex;flex-direction:column;gap:5px}
-.form-group label{font-size:.76rem;font-weight:700;color:var(--slate)}
-.req{color:var(--error);margin-left:2px}
-.form-group input,.form-group select,.form-group textarea{
-  font-family:var(--font);font-size:.88rem;padding:10px 14px;
-  border:1.5px solid var(--border);border-radius:9px;background:var(--bg);
-  color:var(--text);outline:none;transition:border .18s,background .18s;width:100%}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
-  border-color:var(--gold);background:var(--white)}
-.form-group input.err{border-color:var(--error);background:#fff8f8}
-.hint{font-size:.71rem;color:var(--text-sec);margin-top:2px}
-.form-group textarea{resize:vertical;min-height:72px}
-
-/* ─── Section dividers ─── */
-.section-label{font-size:.7rem;font-weight:800;color:var(--slate);
-               text-transform:uppercase;letter-spacing:.1em;
-               margin:20px 0 12px;padding-bottom:6px;
-               border-bottom:1px solid var(--border-lt)}
-
-/* ─── Checkbox / Radio ─── */
-.checkbox-row{display:flex;align-items:center;gap:10px;cursor:pointer;
-              padding:10px 14px;border-radius:9px;border:1.5px solid var(--border);
-              background:var(--bg);transition:.15s;user-select:none}
-.checkbox-row:hover{border-color:var(--gold)}
-.checkbox-row.checked{border-color:var(--green);background:var(--green-light)}
-.checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--green);
-                                    flex-shrink:0}
-.checkbox-row span{font-size:.85rem;color:var(--text);line-height:1.4}
-.radio-group{display:flex;gap:10px}
-.radio-btn{flex:1;display:flex;align-items:center;gap:8px;cursor:pointer;
-           padding:10px 14px;border-radius:9px;border:1.5px solid var(--border);
-           background:var(--bg);transition:.15s;user-select:none;font-size:.85rem}
-.radio-btn:hover{border-color:var(--gold)}
-.radio-btn.selected{border-color:var(--green);background:var(--green-light);font-weight:600}
-.radio-btn input{accent-color:var(--green)}
-
-/* ─── Info box ─── */
-.info-box{background:var(--green-light);border:1px solid var(--border);
-          border-radius:10px;padding:14px 16px;font-size:.82rem;
-          color:var(--navy);line-height:1.55;margin-bottom:18px}
-.info-box strong{color:var(--green)}
-.warn-box{background:#FFFBEB;border:1px solid #FCD34D;border-radius:10px;
-          padding:14px 16px;font-size:.82rem;color:#78350F;line-height:1.55;margin-top:10px}
-
-/* ─── Signature Canvas ─── */
-.sig-wrap{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;
-          background:#fefefe;margin-bottom:8px;position:relative}
-.sig-wrap canvas{display:block;width:100%;height:160px;cursor:crosshair;touch-action:none}
-.sig-toolbar{display:flex;justify-content:flex-end;padding:6px 10px;
-             border-top:1px solid var(--border-lt)}
-.sig-clear{background:none;border:1px solid var(--border);border-radius:6px;
-           padding:4px 12px;font-size:.75rem;font-weight:600;color:var(--slate);
-           cursor:pointer;font-family:var(--font)}
-.sig-clear:hover{background:var(--bg)}
-
-/* ─── Navigation Buttons ─── */
-.btn-row{display:flex;gap:12px;margin-top:28px}
-.btn-back{flex:1;padding:13px;border-radius:10px;border:1.5px solid var(--border);
-          background:var(--white);color:var(--slate);font-family:var(--font);
-          font-size:.92rem;font-weight:700;cursor:pointer;transition:.2s}
-.btn-back:hover{background:var(--bg)}
-.btn-next{flex:2;padding:13px;border-radius:10px;border:none;
-          background:var(--navy);color:var(--white);font-family:var(--font);
-          font-size:.92rem;font-weight:700;cursor:pointer;transition:.2s;
-          box-shadow:0 3px 14px rgba(26,58,26,.25)}
-.btn-next:hover{background:var(--navy-deep)}
-.btn-next:disabled{background:#9CA3AF;cursor:not-allowed;box-shadow:none}
-.btn-submit{flex:2;padding:13px;border-radius:10px;border:none;
-            background:linear-gradient(135deg,var(--green) 0%,#1B6B41 100%);
-            color:var(--white);font-family:var(--font);
-            font-size:.92rem;font-weight:700;cursor:pointer;transition:.2s;
-            box-shadow:0 3px 14px rgba(26,58,26,.3)}
-.btn-submit:hover{background:linear-gradient(135deg,#2D7A4F 0%,#1A5A38 100%)}
-.btn-submit:disabled{background:#9CA3AF;cursor:not-allowed;box-shadow:none}
-
-/* ─── Success Screen ─── */
-.success-screen{display:none;padding:48px 32px;text-align:center}
-.success-screen.show{display:block;animation:fadeIn .3s ease}
-.success-icon{width:80px;height:80px;background:var(--success-bg);
-              border-radius:50%;display:flex;align-items:center;justify-content:center;
-              margin:0 auto 20px;font-size:2.2rem}
-.success-screen h2{font-family:var(--font-display);color:var(--navy);
-                   font-size:1.6rem;margin-bottom:8px}
-.success-screen p{font-size:.9rem;color:var(--text-sec);line-height:1.6;
-                  max-width:460px;margin:0 auto 20px}
-.confirm-box{display:inline-block;background:var(--gold-light);
-             border:2px solid var(--gold);border-radius:12px;
-             padding:16px 32px;margin-bottom:24px}
-.confirm-box .label{font-size:.7rem;font-weight:800;color:var(--slate);
-                    text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-.confirm-box .value{font-size:1.4rem;font-weight:800;color:var(--navy);
-                    font-family:var(--font-display);letter-spacing:.04em}
-.next-steps{background:var(--green-light);border:1px solid var(--border);
-            border-radius:12px;padding:20px 24px;text-align:left;
-            max-width:480px;margin:0 auto}
-.next-steps h4{font-size:.85rem;font-weight:800;color:var(--navy);
-               margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em}
-.next-steps li{font-size:.83rem;color:var(--text);line-height:1.5;
-               padding:4px 0;list-style:none;display:flex;gap:8px}
-.next-steps li::before{content:'→';color:var(--gold);font-weight:700;flex-shrink:0}
-
-/* ─── Toast ─── */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-       padding:11px 22px;border-radius:8px;font-size:.84rem;font-weight:600;
-       font-family:var(--font);z-index:9999;box-shadow:var(--shadow-lg);
-       color:var(--white);animation:fadeIn .25s ease}
-.toast.err{background:var(--error)}
-.toast.ok{background:var(--success)}
-
-/* ─── Responsive ─── */
-@media(max-width:640px){
-  .form-grid{grid-template-columns:1fr}
-  .step-panel{padding:20px 18px 24px}
-  .progress-wrap{padding:20px 18px 0}
-  .step-dot .step-label{display:none}
-  .radio-group{flex-direction:column}
-}
 </style>
 </head>
 <body>
 
-<!-- ═══ HEADER ═══ -->
-<div class="header">
-  <div class="logo">
-    <div class="logo-icon">365</div>
-    <div class="logo-text">
-      <h2>Our 365 Financial Solution</h2>
-      <span>Licensed Agent Onboarding</span>
-    </div>
+<div class="top-bar">
+  <div class="logo">365</div>
+  <div>
+    <div class="name">Our 365 Financial Solution</div>
+    <div class="sub">Licensed Agent Onboarding</div>
   </div>
-  <div class="header-badge">Now Accepting Agents</div>
 </div>
 
-<!-- ═══ MAIN FORM ═══ -->
 <div class="container">
-<div class="form-card">
 
   <!-- Progress -->
-  <div class="progress-wrap">
-    <div class="progress-top">
-      <span class="progress-label" id="progressLabel">Step 1 of 5</span>
-      <span class="progress-step" id="progressPct">Personal Info</span>
-    </div>
-    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
-    <div class="step-dots">
-      <div class="step-dot active" data-step="1">
-        <div class="step-dot-num" id="dot1">1</div>
-        <span class="step-label">Personal</span>
-      </div>
-      <div class="step-dot" data-step="2">
-        <div class="step-dot-num" id="dot2">2</div>
-        <span class="step-label">License</span>
-      </div>
-      <div class="step-dot" data-step="3">
-        <div class="step-dot-num" id="dot3">3</div>
-        <span class="step-label">Agency</span>
-      </div>
-      <div class="step-dot" data-step="4">
-        <div class="step-dot-num" id="dot4">4</div>
-        <span class="step-label">Banking</span>
-      </div>
-      <div class="step-dot" data-step="5">
-        <div class="step-dot-num" id="dot5">5</div>
-        <span class="step-label">Sign</span>
-      </div>
+  <div class="progress-bar">
+    <div class="progress-label" id="progressLabel">Step 1 of 5 — Personal Info</div>
+    <div class="progress-steps">
+      <div class="step-dot"><div class="dot active" id="dot1">1</div><span>Personal</span></div>
+      <div class="step-dot"><div class="dot" id="dot2">2</div><span>License</span></div>
+      <div class="step-dot"><div class="dot" id="dot3">3</div><span>Agency</span></div>
+      <div class="step-dot"><div class="dot" id="dot4">4</div><span>Banking</span></div>
+      <div class="step-dot"><div class="dot" id="dot5">5</div><span>Sign</span></div>
     </div>
   </div>
 
-  <!-- ════ STEP 1: Personal Info ════ -->
+  <!-- ── STEP 1: PERSONAL ── -->
   <div class="step-panel active" id="step1">
-    <div class="step-title">Personal Information</div>
-    <p class="step-sub">All fields marked <span style="color:var(--error)">*</span> are required. This information will be used to create your agent profile.</p>
-
-    <div class="form-grid">
-      <div class="form-group">
-        <label>First Name <span class="req">*</span></label>
-        <input type="text" id="firstName" placeholder="Jane" autocomplete="given-name">
-      </div>
-      <div class="form-group">
-        <label>Last Name <span class="req">*</span></label>
-        <input type="text" id="lastName" placeholder="Smith" autocomplete="family-name">
-      </div>
-      <div class="form-group">
-        <label>Email Address <span class="req">*</span></label>
-        <input type="email" id="email" placeholder="jane@example.com" autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label>Phone Number <span class="req">*</span></label>
-        <input type="tel" id="phone" placeholder="(954) 000-0000" autocomplete="tel">
-      </div>
-      <div class="form-group full">
-        <label>Home Address <span class="req">*</span></label>
-        <input type="text" id="address" placeholder="123 Main St, Fort Lauderdale, FL 33311" autocomplete="street-address">
-      </div>
-      <div class="form-group">
-        <label>Date of Birth <span class="req">*</span></label>
-        <input type="date" id="dob" max="">
-      </div>
-      <div class="form-group">
-        <label>Last 4 of SSN <span class="req">*</span></label>
-        <input type="text" id="ssnLast4" placeholder="••••" maxlength="4" pattern="[0-9]{4}">
-        <span class="hint">Used for identity verification only. Never stored in full.</span>
+    <div class="card">
+      <h2>Personal Information</h2>
+      <div class="subtitle">All fields marked * are required. This information will be used to create your agent profile.</div>
+      <div class="grid">
+        <div class="field" id="f_first_name">
+          <label>First Name <span class="req">*</span></label>
+          <input type="text" id="first_name" autocomplete="given-name">
+          <span class="err">Required</span>
+        </div>
+        <div class="field" id="f_last_name">
+          <label>Last Name <span class="req">*</span></label>
+          <input type="text" id="last_name" autocomplete="family-name">
+          <span class="err">Required</span>
+        </div>
+        <div class="field full" id="f_email">
+          <label>Email Address <span class="req">*</span></label>
+          <input type="email" id="email" autocomplete="email">
+          <span class="err">Valid email required</span>
+        </div>
+        <div class="field" id="f_phone">
+          <label>Phone Number <span class="req">*</span></label>
+          <input type="tel" id="phone" placeholder="(555) 000-0000" autocomplete="tel">
+          <span class="err">Required</span>
+        </div>
+        <div class="field" id="f_dob">
+          <label>Date of Birth <span class="req">*</span></label>
+          <input type="date" id="dob">
+          <span class="err">Required</span>
+        </div>
+        <div class="field full" id="f_address">
+          <label>Home Address <span class="req">*</span></label>
+          <input type="text" id="address" placeholder="Street, City, State, ZIP" autocomplete="street-address">
+          <span class="err">Required</span>
+        </div>
+        <div class="field" id="f_ssn_last4">
+          <label>Last 4 of SSN <span class="req">*</span></label>
+          <input type="text" id="ssn_last4" maxlength="4" placeholder="XXXX" inputmode="numeric">
+          <span class="hint">Used for identity verification only</span>
+          <span class="err">4 digits required</span>
+        </div>
       </div>
     </div>
-
-    <div class="btn-row">
-      <button class="btn-next" onclick="nextStep(1)">Continue → License Info</button>
+    <div class="nav">
+      <span></span>
+      <button class="btn btn-next" onclick="nextStep(1)">Continue → License Info</button>
     </div>
   </div>
 
-  <!-- ════ STEP 2: License Info ════ -->
+  <!-- ── STEP 2: LICENSE ── -->
   <div class="step-panel" id="step2">
-    <div class="step-title">License &amp; Credentials</div>
-    <p class="step-sub">Enter your active Florida insurance license information exactly as it appears on your license.</p>
-
-    <div class="form-grid">
-      <div class="form-group">
-        <label>License Number <span class="req">*</span></label>
-        <input type="text" id="licenseNumber" placeholder="e.g. W123456">
-      </div>
-      <div class="form-group">
-        <label>License State <span class="req">*</span></label>
-        <select id="licenseState">
-          <option value="">Select State</option>
-          <option value="FL">Florida</option>
-          <option value="GA">Georgia</option>
-          <option value="TX">Texas</option>
-          <option value="NC">North Carolina</option>
-          <option value="SC">South Carolina</option>
-          <option value="VA">Virginia</option>
-          <option value="OH">Ohio</option>
-          <option value="MI">Michigan</option>
-          <option value="AL">Alabama</option>
-          <option value="TN">Tennessee</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>License Type <span class="req">*</span></label>
-        <select id="licenseType">
-          <option value="">Select Type</option>
-          <option value="Life & Health">Life &amp; Health</option>
-          <option value="Life Only">Life Only</option>
-          <option value="Health Only">Health Only</option>
-          <option value="Life, Health & Variable Annuity">Life, Health &amp; Variable Annuity</option>
-          <option value="Property & Casualty">Property &amp; Casualty</option>
-          <option value="All Lines">All Lines</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>License Expiry Date <span class="req">*</span></label>
-        <input type="date" id="licenseExpiry">
-      </div>
-      <div class="form-group">
-        <label>NPN (National Producer Number) <span class="req">*</span></label>
-        <input type="text" id="npn" placeholder="e.g. 12345678">
-        <span class="hint">Find yours at <a href="https://nipr.com" target="_blank" style="color:var(--green)">nipr.com</a></span>
-      </div>
-      <div class="form-group">
-        <label>Years of Experience</label>
-        <select id="experience">
-          <option value="">Select</option>
-          <option value="New to industry">New to industry</option>
-          <option value="Less than 1 year">Less than 1 year</option>
-          <option value="1-2 years">1–2 years</option>
-          <option value="3-5 years">3–5 years</option>
-          <option value="6-10 years">6–10 years</option>
-          <option value="10+ years">10+ years</option>
-        </select>
-      </div>
-      <div class="form-group full">
-        <label>Lines of Authority <span class="req">*</span></label>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px" id="loaGroup">
-          <label class="checkbox-row" id="loa_life">
-            <input type="checkbox" value="Life"> <span>Life Insurance</span>
-          </label>
-          <label class="checkbox-row" id="loa_health">
-            <input type="checkbox" value="Health"> <span>Health Insurance (ACA / Medicare)</span>
-          </label>
-          <label class="checkbox-row" id="loa_annuity">
-            <input type="checkbox" value="Fixed Annuity"> <span>Fixed Annuity</span>
-          </label>
-          <label class="checkbox-row" id="loa_variable">
-            <input type="checkbox" value="Variable Annuity"> <span>Variable Annuity (Series 6 required)</span>
-          </label>
+    <div class="card">
+      <h2>License &amp; Credentials</h2>
+      <div class="subtitle">Enter your active insurance license information exactly as it appears on your license.</div>
+      <div class="grid">
+        <div class="field" id="f_license_number">
+          <label>License Number <span class="req">*</span></label>
+          <input type="text" id="license_number" placeholder="e.g., E123456">
+          <span class="err">Required</span>
         </div>
-        <span class="hint" style="margin-top:6px">Select all that apply to your active license.</span>
+        <div class="field" id="f_license_state">
+          <label>License State <span class="req">*</span></label>
+          <select id="license_state">
+            <option value="">Select State</option>
+            <option>Florida</option><option>Georgia</option><option>North Carolina</option>
+            <option>South Carolina</option><option>Virginia</option><option>Ohio</option>
+            <option>Michigan</option><option>Alabama</option><option>Tennessee</option>
+            <option>Texas</option><option>Other</option>
+          </select>
+          <span class="err">Required</span>
+        </div>
+        <div class="field" id="f_license_type">
+          <label>License Type <span class="req">*</span></label>
+          <select id="license_type">
+            <option value="">Select Type</option>
+            <option>Life &amp; Health</option><option>Life Only</option><option>Health Only</option>
+            <option>Life, Health &amp; Variable Annuity</option><option>Property &amp; Casualty</option><option>All Lines</option>
+          </select>
+          <span class="err">Required</span>
+        </div>
+        <div class="field" id="f_license_expiry">
+          <label>License Expiry Date <span class="req">*</span></label>
+          <input type="date" id="license_expiry">
+          <span class="err">Required</span>
+        </div>
+        <div class="field" id="f_npn">
+          <label>NPN (National Producer Number) <span class="req">*</span></label>
+          <input type="text" id="npn" placeholder="e.g., 12345678" inputmode="numeric">
+          <span class="hint">Find yours at <a href="https://nipr.com" target="_blank" style="color:#325838">nipr.com</a></span>
+          <span class="err">Required</span>
+        </div>
+        <div class="field">
+          <label>Years of Experience</label>
+          <select id="experience">
+            <option value="">Select</option>
+            <option>New to industry</option><option>Less than 1 year</option>
+            <option>1–2 years</option><option>3–5 years</option>
+            <option>6–10 years</option><option>10+ years</option>
+          </select>
+        </div>
+
+        <!-- Lines of Authority -->
+        <div class="field full" id="f_lines_of_authority">
+          <label>Lines of Authority <span class="req">*</span></label>
+          <div class="check-group">
+            <label><input type="checkbox" name="lines_of_authority" value="Life Insurance"> Life Insurance</label>
+            <label><input type="checkbox" name="lines_of_authority" value="Health / ACA / Medicare"> Health Insurance (ACA / Medicare)</label>
+            <label><input type="checkbox" name="lines_of_authority" value="Fixed Annuity"> Fixed Annuity</label>
+            <label><input type="checkbox" name="lines_of_authority" value="Variable Annuity"> Variable Annuity (Series 6 required)</label>
+          </div>
+          <span class="hint">Select all that apply to your active license.</span>
+          <span class="err" id="err_lines">Select at least one</span>
+        </div>
+
+        <!-- States Appointed -->
+        <div class="field full" id="f_states_appointed">
+          <label>States Where You Hold Active Appointments <span class="req">*</span></label>
+          <div class="states-ctrl">
+            <button type="button" onclick="selectAllStates(true)">Select All</button>
+            <button type="button" onclick="selectAllStates(false)">Clear All</button>
+          </div>
+          <div class="states-grid" id="statesGrid"></div>
+          <span class="hint">Check every state where you currently have an active appointment.</span>
+          <span class="err" id="err_states">Select at least one state</span>
+        </div>
       </div>
     </div>
-
-    <div class="btn-row">
-      <button class="btn-back" onclick="prevStep(2)">← Back</button>
-      <button class="btn-next" onclick="nextStep(2)">Continue → Agency Info</button>
+    <div class="nav">
+      <button class="btn btn-back" onclick="prevStep(2)">← Back</button>
+      <button class="btn btn-next" onclick="nextStep(2)">Continue → Agency Info</button>
     </div>
   </div>
 
-  <!-- ════ STEP 3: Agency Info ════ -->
+  <!-- ── STEP 3: AGENCY ── -->
   <div class="step-panel" id="step3">
-    <div class="step-title">Agency &amp; Background</div>
-    <p class="step-sub">Tell us about your agency background and professional credentials.</p>
+    <div class="card">
+      <h2>Agency &amp; Background</h2>
+      <div class="subtitle">Tell us about your agency background and professional credentials.</div>
+      <div class="grid">
+        <div class="field full">
+          <label>Referring Agent / Broker</label>
+          <input type="text" id="referring_agent" placeholder="Name of referring agent (if any)">
+        </div>
+        <div class="field full" id="f_eo_carrier">
+          <label>E&amp;O Insurance Carrier <span class="req">*</span></label>
+          <input type="text" id="eo_carrier" placeholder="e.g., Philadelphia Indemnity, Swiss Re">
+          <span class="hint">Errors &amp; Omissions coverage is required to be appointed with carriers.</span>
+          <span class="err">Required</span>
+        </div>
+        <div class="field full">
+          <label>E&amp;O Policy Number</label>
+          <input type="text" id="eo_policy_number" placeholder="E&O policy number">
+        </div>
+        <div class="field" id="f_eo_expiry">
+          <label>E&amp;O Expiry Date</label>
+          <input type="date" id="eo_expiry">
+        </div>
 
-    <div class="form-grid">
-      <div class="form-group full">
-        <label>Referring Agent / Broker</label>
-        <input type="text" id="referringBroker" placeholder="Name of agent who referred you (leave blank if none)">
+        <div class="field full">
+          <div class="warn-box" style="margin-bottom:14px">
+            <strong>Required disclosure:</strong> Please answer accurately. A "yes" answer does not automatically disqualify you — omitting information may.
+          </div>
+          <label>Have you ever had a license suspended, revoked, or been subject to regulatory action? <span class="req">*</span></label>
+          <div class="radio-group" style="margin-top:8px" id="f_regulatory_action">
+            <label><input type="radio" name="regulatory_action" value="No"> No</label>
+            <label><input type="radio" name="regulatory_action" value="Yes"> Yes</label>
+          </div>
+          <span class="err" id="err_regulatory">Please select one</span>
+        </div>
+
+        <div class="field full" id="regulatory_explain_wrap" style="display:none">
+          <label>Please explain <span class="req">*</span></label>
+          <textarea id="regulatory_explanation" rows="4" placeholder="Provide full details of the regulatory action..."></textarea>
+          <span class="err" id="err_reg_explain">Explanation required when Yes is selected</span>
+        </div>
       </div>
-      <div class="form-group full">
-        <label>E&amp;O Insurance Carrier <span class="req">*</span></label>
-        <input type="text" id="eoCarrier" placeholder="e.g. Swiss Re, Utica National, NAPA">
-        <span class="hint">Errors &amp; Omissions coverage is required to be appointed with carriers.</span>
-      </div>
     </div>
-
-    <div class="section-label">Regulatory &amp; Disciplinary History</div>
-    <div class="info-box">
-      <strong>Required disclosure:</strong> Please answer accurately. A "yes" answer does not automatically disqualify you — omitting information may.
-    </div>
-
-    <div class="form-group full" style="margin-bottom:12px">
-      <label>Have you ever had a license suspended, revoked, or been subject to regulatory action? <span class="req">*</span></label>
-      <div class="radio-group" style="margin-top:8px">
-        <label class="radio-btn" id="reg_no" onclick="selectRegAction('no')">
-          <input type="radio" name="regAction" value="no"> No
-        </label>
-        <label class="radio-btn" id="reg_yes" onclick="selectRegAction('yes')">
-          <input type="radio" name="regAction" value="yes"> Yes
-        </label>
-      </div>
-    </div>
-
-    <div class="form-group full" id="regExplainGroup" style="display:none">
-      <label>Please explain <span class="req">*</span></label>
-      <textarea id="regulatoryExplain" placeholder="Provide details including dates, states, resolution, and current status..."></textarea>
-      <div class="warn-box">⚠️ Disclosure is required. Omitting known information may result in termination of your contract.</div>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn-back" onclick="prevStep(3)">← Back</button>
-      <button class="btn-next" onclick="nextStep(3)">Continue → Direct Deposit</button>
+    <div class="nav">
+      <button class="btn btn-back" onclick="prevStep(3)">← Back</button>
+      <button class="btn btn-next" onclick="nextStep(3)">Continue → Direct Deposit</button>
     </div>
   </div>
 
-  <!-- ════ STEP 4: Banking ════ -->
+  <!-- ── STEP 4: BANKING ── -->
   <div class="step-panel" id="step4">
-    <div class="step-title">Direct Deposit Information</div>
-    <p class="step-sub">Commission payments are issued via direct deposit. Enter your banking details below. We collect only the last 4 digits of your account and routing numbers.</p>
-
-    <div class="info-box">
-      <strong>Security note:</strong> We never store full account or routing numbers. Last 4 digits are used for verification only.
-    </div>
-
-    <div class="form-grid">
-      <div class="form-group full">
-        <label>Bank Name <span class="req">*</span></label>
-        <input type="text" id="bankName" placeholder="e.g. Chase, Bank of America, Wells Fargo">
+    <div class="card">
+      <h2>Commission Direct Deposit</h2>
+      <div class="subtitle">Enter your full banking details for commission payments via direct deposit.</div>
+      <div class="secure-box" style="margin-bottom:20px">
+        <strong>Secure &amp; Encrypted:</strong> Your banking information is collected solely for commission direct deposit setup and transmitted securely. It is never shared with third parties.
       </div>
-      <div class="form-group full">
-        <label>Account Type <span class="req">*</span></label>
-        <div class="radio-group" style="margin-top:4px">
-          <label class="radio-btn" id="acct_checking" onclick="selectAcctType('checking')">
-            <input type="radio" name="acctType" value="checking"> Checking
-          </label>
-          <label class="radio-btn" id="acct_savings" onclick="selectAcctType('savings')">
-            <input type="radio" name="acctType" value="savings"> Savings
-          </label>
+      <div class="grid">
+        <div class="field" id="f_bank_name">
+          <label>Bank Name <span class="req">*</span></label>
+          <input type="text" id="bank_name" placeholder="e.g., Chase, Wells Fargo, Bank of America">
+          <span class="err">Required</span>
+        </div>
+        <div class="field" id="f_account_type">
+          <label>Account Type <span class="req">*</span></label>
+          <div class="radio-group" style="margin-top:4px">
+            <label><input type="radio" name="account_type" value="Checking"> Checking</label>
+            <label><input type="radio" name="account_type" value="Savings"> Savings</label>
+          </div>
+          <span class="err" id="err_acct_type">Please select account type</span>
+        </div>
+        <div class="field" id="f_routing_number">
+          <label>Full Routing Number <span class="req">*</span></label>
+          <input type="text" id="routing_number" maxlength="9" placeholder="9-digit routing number" inputmode="numeric" autocomplete="off">
+          <span class="hint">9 digits — found at the bottom left of your check</span>
+          <span class="err" id="err_routing">Must be exactly 9 digits</span>
+        </div>
+        <div class="field" id="f_account_number">
+          <label>Full Account Number <span class="req">*</span></label>
+          <input type="text" id="account_number" placeholder="Full account number" inputmode="numeric" autocomplete="off">
+          <span class="hint">Enter your complete account number</span>
+          <span class="err" id="err_acct_num">Required</span>
+        </div>
+        <div class="field" id="f_account_number_confirm">
+          <label>Confirm Account Number <span class="req">*</span></label>
+          <input type="text" id="account_number_confirm" placeholder="Re-enter account number" inputmode="numeric" autocomplete="off">
+          <span class="err" id="err_acct_confirm">Account numbers do not match</span>
+        </div>
+        <div class="field" id="f_name_on_account">
+          <label>Name on Account <span class="req">*</span></label>
+          <input type="text" id="name_on_account" placeholder="Exactly as it appears on your bank account">
+          <span class="err">Required</span>
         </div>
       </div>
-      <div class="form-group">
-        <label>Last 4 of Routing Number <span class="req">*</span></label>
-        <input type="text" id="routingLast4" placeholder="••••" maxlength="4" pattern="[0-9]{4}">
-      </div>
-      <div class="form-group">
-        <label>Last 4 of Account Number <span class="req">*</span></label>
-        <input type="text" id="accountLast4" placeholder="••••" maxlength="4" pattern="[0-9]{4}">
-      </div>
-      <div class="form-group full">
-        <label>Name on Account <span class="req">*</span></label>
-        <input type="text" id="accountName" placeholder="Exactly as it appears on your bank account">
-      </div>
     </div>
-
-    <div class="btn-row">
-      <button class="btn-back" onclick="prevStep(4)">← Back</button>
-      <button class="btn-next" onclick="nextStep(4)">Continue → Review &amp; Sign</button>
+    <div class="nav">
+      <button class="btn btn-back" onclick="prevStep(4)">← Back</button>
+      <button class="btn btn-next" onclick="nextStep(4)">Continue → Review &amp; Sign</button>
     </div>
   </div>
 
-  <!-- ════ STEP 5: Signature ════ -->
+  <!-- ── STEP 5: SIGN ── -->
   <div class="step-panel" id="step5">
-    <div class="step-title">Review &amp; Electronic Signature</div>
-    <p class="step-sub">By signing below, you acknowledge that all information provided is accurate and agree to Our 365 Financial Solution's Independent Contractor Agreement and Agent Handbook.</p>
+    <div class="card">
+      <h2>Review &amp; Electronic Signature</h2>
+      <div class="subtitle">By signing below, you acknowledge all information is accurate and agree to Our 365 Financial Solution's Independent Contractor Agreement and Agent Handbook.</div>
 
-    <div class="info-box" id="reviewSummary" style="font-size:.82rem;line-height:1.8">
-      <!-- Populated by JS -->
-    </div>
-
-    <div class="section-label">Electronic Signature</div>
-
-    <div class="form-grid">
-      <div class="form-group full">
+      <div class="field full" style="margin-bottom:18px" id="f_typed_name">
         <label>Type Your Full Legal Name <span class="req">*</span></label>
-        <input type="text" id="signedName" placeholder="Jane M. Smith"
-               oninput="syncSigName(this.value)">
-        <span class="hint">This constitutes your legal electronic signature.</span>
+        <input type="text" id="typed_name" placeholder="This constitutes your legal electronic signature">
+        <span class="err">Full legal name required</span>
       </div>
-      <div class="form-group full">
-        <label>Draw Your Signature <span class="req">*</span>
-          <span style="font-weight:400;color:var(--text-sec)"> — draw in the box below</span>
-        </label>
-        <div class="sig-wrap">
-          <canvas id="sigCanvas"></canvas>
+
+      <div class="field full">
+        <label>Draw Your Signature <span class="req">*</span></label>
+        <canvas id="sigCanvas"></canvas>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+          <span class="sig-status" id="sigStatus">Signature not yet drawn</span>
+          <button type="button" onclick="clearSig()" style="font-size:0.78rem;padding:4px 12px;border:1px solid #D1D5DB;border-radius:6px;cursor:pointer;background:#fff">Clear Signature</button>
         </div>
-        <div class="sig-toolbar">
-          <button class="sig-clear" onclick="clearSig()">Clear Signature</button>
-        </div>
-        <span class="hint" id="sigStatus" style="color:var(--text-sec)">Signature not yet drawn</span>
+        <span class="err" id="err_sig" style="display:none">Please draw your signature</span>
+      </div>
+
+      <div class="warn-box" style="margin-top:20px;font-size:0.82rem">
+        By clicking <strong>Submit Application</strong>, I certify that all information is complete and accurate.
+        I understand that falsification of any information is grounds for immediate termination of my contract.
+        I consent to be contacted regarding my application via the phone and email provided.
       </div>
     </div>
-
-    <div style="background:#FFFBEB;border:1px solid #FCD34D;border-radius:10px;
-                padding:14px 16px;font-size:.8rem;color:#78350F;line-height:1.6;margin-top:4px">
-      By clicking <strong>Submit Application</strong>, I certify that all information is complete and accurate.
-      I understand that falsification of any information is grounds for immediate termination of my contract.
-      I consent to be contacted regarding my application via the phone and email provided.
-    </div>
-
-    <div class="btn-row" style="margin-top:20px">
-      <button class="btn-back" onclick="prevStep(5)">← Back</button>
-      <button class="btn-submit" id="submitBtn" onclick="submitForm()">
-        ✅ Submit Application
-      </button>
+    <div class="nav">
+      <button class="btn btn-back" onclick="prevStep(5)">← Back</button>
+      <button class="btn btn-submit" id="submitBtn" onclick="submitForm()">✅ Submit Application</button>
     </div>
   </div>
 
-  <!-- ════ SUCCESS SCREEN ════ -->
-  <div class="success-screen" id="successScreen">
-    <div class="success-icon">✅</div>
-    <h2>Application Submitted!</h2>
-    <p>Thank you for applying to Our 365 Financial Solution. Your application is under review and you'll receive a welcome email with your portal login credentials once approved.</p>
-    <div class="confirm-box">
-      <div class="label">Your Confirmation Number</div>
-      <div class="value" id="confirmNumDisplay">—</div>
+  <!-- ── SUCCESS ── -->
+  <div id="successScreen">
+    <div class="card">
+      <div class="success-icon">✅</div>
+      <h2>Application Submitted!</h2>
+      <p>Thank you for applying to Our 365 Financial Solution.<br>Your application is under review.</p>
+      <div class="conf-num" id="confNum"></div>
+      <div class="next-steps">
+        <h4>What Happens Next</h4>
+        <ul style="list-style:none;padding:0">
+          <li>✅ Our team will review your application within 1–2 business days</li>
+          <li>✅ You'll receive an email with your portal login credentials once approved</li>
+          <li>✅ Log in, set your permanent password, and complete carrier contracting</li>
+          <li>✅ Start receiving leads through the Agent Marketplace</li>
+        </ul>
+      </div>
+      <p style="margin-top:20px;font-size:0.84rem;color:#6B7280">
+        Questions? Call <strong>(844) 687-3653</strong> or email
+        <a href="mailto:onboarding@our365financialsolution.net" style="color:#325838">onboarding@our365financialsolution.net</a>
+      </p>
     </div>
-    <div class="next-steps">
-      <h4>What Happens Next</h4>
-      <ul>
-        <li>Our team will review your application within 1–2 business days</li>
-        <li>You'll receive an email at <strong id="confirmEmail">—</strong> with your portal login</li>
-        <li>Log in, set your password, and complete carrier contracting</li>
-        <li>Start receiving leads through the Agent Marketplace</li>
-      </ul>
-    </div>
-    <p style="margin-top:20px;font-size:.8rem;color:var(--text-sec)">
-      Questions? Call <strong>(844) 687-3653</strong> or email
-      <a href="mailto:onboarding@our365financialsolution.net" style="color:var(--green)">onboarding@our365financialsolution.net</a>
-    </p>
   </div>
 
-</div><!-- /form-card -->
 </div><!-- /container -->
 
-<!-- ─── Footer ─── -->
-<div style="text-align:center;padding:20px 24px;font-size:.72rem;color:var(--text-sec);line-height:1.6">
-  Our 365 Financial Solution LLC · 3500 N State Road 7, Suite 310, Lauderdale Lakes, FL 33319<br>
-  <a href="https://our365financialsolution.net" style="color:var(--gold)">our365financialsolution.net</a> ·
-  <a href="mailto:info@our365financialsolution.net" style="color:var(--gold)">info@our365financialsolution.net</a><br>
-  © 2026 Our 365 Financial Solution LLC. All rights reserved.
-</div>
-
-<!-- ═══════════════════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-'use strict';
+// ════════════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwMjA4NTgsImV4cCI6MjA1ODU5Njg1OH0.vBsnxVrTblqK-dCNbKQlmmkDHNWMv8Ia3GBQsrBZbIc';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// ─── Config ────────────────────────────────────────────────────────────────
-const SUPABASE_URL  = 'https://ezcyhxvloltdtbuwltry.supabase.co';
-const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTY1MTEsImV4cCI6MjA4OTE5MjUxMX0.e8fqOaSJWBrAElKq30s293k6jpkQI0YhxdqOL6bxuVM';
-const EMAILJS_PK    = 'ESj_ZXJOCKi-is5Ya';
-const EMAILJS_SVC   = 'service_95qnnh4';
-const EMAILJS_TPL   = 'template_mnb46qe';
-const NOTIFY_EMAIL  = 'onboarding365fs@gmail.com';
+const EMAILJS_SERVICE  = 'service_95qnnh4';
+const EMAILJS_TEMPLATE = 'template_mnb46qe';
+const EMAILJS_KEY      = 'ESj_ZXJOCKi-is5Ya';
 
-// ─── Supabase init ─────────────────────────────────────────────────────────
-let sb = null;
-try {
-  if (window.supabase && window.supabase.createClient) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  }
-} catch(e) { sb = null; }
+// ════════════════════════════════════════════════════════════
+//  STATES
+// ════════════════════════════════════════════════════════════
+const ALL_STATES = [
+  'Alabama','Alaska','Arizona','Arkansas','California','Colorado',
+  'Connecticut','Delaware','District of Columbia','Florida','Georgia',
+  'Hawaii','Idaho','Illinois','Indiana','Iowa','Kansas','Kentucky',
+  'Louisiana','Maine','Maryland','Massachusetts','Michigan','Minnesota',
+  'Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire',
+  'New Jersey','New Mexico','New York','North Carolina','North Dakota',
+  'Ohio','Oklahoma','Oregon','Pennsylvania','Rhode Island',
+  'South Carolina','South Dakota','Tennessee','Texas','Utah','Vermont',
+  'Virginia','Washington','West Virginia','Wisconsin','Wyoming'
+];
 
-// ─── EmailJS init ──────────────────────────────────────────────────────────
-try { if (typeof emailjs !== 'undefined') emailjs.init(EMAILJS_PK); } catch(e) {}
-
-// ─── State ─────────────────────────────────────────────────────────────────
-let currentStep  = 1;
-const TOTAL_STEPS = 5;
-let sigDrawn      = false;
-let regAction     = '';
-let acctType      = '';
-
-const STEP_NAMES = ['Personal Info','License','Agency','Banking','Sign & Submit'];
-
-// ─── ID / Number generators ─────────────────────────────────────────────────
-function genId() {
-  return 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
-}
-function genAgentNumber() {
-  // Format: A365-XXXX where XXXX is timestamp-derived
-  const n = (Date.now() % 10000).toString().padStart(4, '0');
-  return 'A365-' + n;
-}
-function genConfirmation() {
-  const d  = new Date();
-  const yr = d.getFullYear();
-  const mo = String(d.getMonth() + 1).padStart(2, '0');
-  const dy = String(d.getDate()).padStart(2, '0');
-  const rnd = Math.floor(1000 + Math.random() * 9000);
-  return `CNF-${yr}${mo}${dy}-${rnd}`;
-}
-
-// ─── Phone formatter ────────────────────────────────────────────────────────
-document.getElementById('phone').addEventListener('input', function() {
-  let v = this.value.replace(/\D/g, '').slice(0, 10);
-  if (v.length > 6) v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
-  else if (v.length > 3) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
-  this.value = v;
+// Render states checkboxes
+const grid = document.getElementById('statesGrid');
+ALL_STATES.forEach(s => {
+  const lbl = document.createElement('label');
+  lbl.innerHTML = `<input type="checkbox" name="states_appointed" value="${s}"> ${s}`;
+  grid.appendChild(lbl);
 });
 
-// ─── 4-digit-only fields ────────────────────────────────────────────────────
-['ssnLast4','routingLast4','accountLast4'].forEach(id => {
-  document.getElementById(id).addEventListener('input', function() {
-    this.value = this.value.replace(/\D/g,'').slice(0,4);
-  });
-});
-
-// ─── LOA checkboxes styling ─────────────────────────────────────────────────
-document.querySelectorAll('#loaGroup input[type=checkbox]').forEach(cb => {
-  cb.addEventListener('change', function() {
-    this.closest('.checkbox-row').classList.toggle('checked', this.checked);
-  });
-});
-
-// ─── Regulatory action toggle ───────────────────────────────────────────────
-function selectRegAction(val) {
-  regAction = val;
-  document.getElementById('reg_yes').classList.toggle('selected', val === 'yes');
-  document.getElementById('reg_no').classList.toggle('selected',  val === 'no');
-  document.getElementById('regExplainGroup').style.display = val === 'yes' ? 'block' : 'none';
-  document.querySelector(`input[value="${val}"][name="regAction"]`).checked = true;
+function selectAllStates(v) {
+  document.querySelectorAll('[name=states_appointed]').forEach(c => c.checked = v);
 }
 
-// ─── Account type toggle ─────────────────────────────────────────────────────
-function selectAcctType(val) {
-  acctType = val;
-  document.getElementById('acct_checking').classList.toggle('selected', val === 'checking');
-  document.getElementById('acct_savings').classList.toggle('selected',  val === 'savings');
-  document.querySelector(`input[value="${val}"][name="acctType"]`).checked = true;
-}
+// ════════════════════════════════════════════════════════════
+//  STEP NAVIGATION
+// ════════════════════════════════════════════════════════════
+let currentStep = 1;
+const STEP_LABELS = ['','Personal Info','License & Credentials','Agency & Background','Direct Deposit','Review & Sign'];
 
-// ─── Step navigation ─────────────────────────────────────────────────────────
 function showStep(n) {
   document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('step' + n).classList.add('active');
-
-  // Update dots
-  document.querySelectorAll('.step-dot').forEach((d, i) => {
+  for (let i = 1; i <= 5; i++) {
+    const d = document.getElementById('dot' + i);
     d.classList.remove('active','done');
-    const dotN = i + 1;
-    if (dotN < n)      d.classList.add('done');
-    else if (dotN === n) d.classList.add('active');
-    const num = d.querySelector('.step-dot-num');
-    num.textContent = dotN < n ? '✓' : dotN;
-  });
-
-  // Progress bar
-  const pct = Math.round((n / TOTAL_STEPS) * 100);
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = `Step ${n} of ${TOTAL_STEPS}`;
-  document.getElementById('progressPct').textContent   = STEP_NAMES[n - 1];
-
-  if (n === 5) buildReviewSummary();
-  currentStep = n;
+    if (i < n)  d.classList.add('done');
+    if (i === n) d.classList.add('active');
+  }
+  document.getElementById('progressLabel').textContent = `Step ${n} of 5 — ${STEP_LABELS[n]}`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  currentStep = n;
 }
 
 function nextStep(from) {
   if (!validateStep(from)) return;
   showStep(from + 1);
 }
-function prevStep(from) { showStep(from - 1); }
 
-// ─── Validation ──────────────────────────────────────────────────────────────
+function prevStep(from) {
+  showStep(from - 1);
+}
+
+// ════════════════════════════════════════════════════════════
+//  VALIDATION
+// ════════════════════════════════════════════════════════════
+function req(id, fieldId) {
+  const el = document.getElementById(id);
+  const fw = document.getElementById(fieldId || ('f_' + id));
+  const v  = el ? el.value.trim() : '';
+  if (!v) { if (fw) fw.classList.add('invalid'); return false; }
+  if (fw) fw.classList.remove('invalid');
+  return true;
+}
+
 function validateStep(n) {
   let ok = true;
-
-  function req(id, label) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const val = el.value.trim();
-    if (!val) {
-      el.classList.add('err');
-      ok = false;
-      el.addEventListener('input', () => el.classList.remove('err'), { once: true });
-    }
-  }
+  // Clear all invalid first
+  document.querySelectorAll('.field.invalid').forEach(f => f.classList.remove('invalid'));
 
   if (n === 1) {
-    ['firstName','lastName','email','address','dob','ssnLast4'].forEach(id => req(id));
-    req('phone');
-    // email format
-    const em = document.getElementById('email').value.trim();
-    if (em && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) {
-      document.getElementById('email').classList.add('err');
-      ok = false;
-      showToast('Please enter a valid email address.', 'err');
+    if (!req('first_name'))  ok = false;
+    if (!req('last_name'))   ok = false;
+    const em = document.getElementById('email');
+    if (!em || !em.value.includes('@')) {
+      document.getElementById('f_email')?.classList.add('invalid'); ok = false;
     }
-    // SSN 4 digits
-    const ssn = document.getElementById('ssnLast4').value.trim();
-    if (ssn && !/^\d{4}$/.test(ssn)) {
-      document.getElementById('ssnLast4').classList.add('err');
-      ok = false;
+    if (!req('phone'))   ok = false;
+    if (!req('address')) ok = false;
+    if (!req('dob'))     ok = false;
+    const ssn = document.getElementById('ssn_last4');
+    if (!ssn || ssn.value.replace(/\D/g,'').length !== 4) {
+      document.getElementById('f_ssn_last4')?.classList.add('invalid'); ok = false;
     }
   }
 
   if (n === 2) {
-    ['licenseNumber','licenseState','licenseType','licenseExpiry','npn'].forEach(id => req(id));
-    // At least 1 LOA checked
-    const checked = [...document.querySelectorAll('#loaGroup input:checked')];
-    if (!checked.length) {
-      showToast('Please select at least one Line of Authority.', 'err');
+    if (!req('license_number')) ok = false;
+    if (!req('license_state','f_license_state'))  ok = false;
+    if (!req('license_type','f_license_type'))    ok = false;
+    if (!req('license_expiry'))  ok = false;
+    if (!req('npn'))             ok = false;
+    // Lines of authority
+    const lines = document.querySelectorAll('[name=lines_of_authority]:checked');
+    if (lines.length === 0) {
+      document.getElementById('f_lines_of_authority')?.classList.add('invalid');
+      document.getElementById('err_lines').style.display = 'block';
       ok = false;
+    } else {
+      document.getElementById('err_lines').style.display = 'none';
+    }
+    // States appointed
+    const states = document.querySelectorAll('[name=states_appointed]:checked');
+    if (states.length === 0) {
+      document.getElementById('f_states_appointed')?.classList.add('invalid');
+      document.getElementById('err_states').style.display = 'block';
+      ok = false;
+    } else {
+      document.getElementById('err_states').style.display = 'none';
     }
   }
 
   if (n === 3) {
-    req('eoCarrier');
-    if (!regAction) {
-      showToast('Please answer the regulatory disclosure question.', 'err');
-      ok = false;
+    if (!req('eo_carrier','f_eo_carrier')) ok = false;
+    const ra = document.querySelector('[name=regulatory_action]:checked');
+    if (!ra) {
+      document.getElementById('err_regulatory').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('err_regulatory').style.display = 'none';
+      if (ra.value === 'Yes' && !document.getElementById('regulatory_explanation').value.trim()) {
+        document.getElementById('err_reg_explain').style.display = 'block'; ok = false;
+      } else {
+        document.getElementById('err_reg_explain').style.display = 'none';
+      }
     }
-    if (regAction === 'yes') req('regulatoryExplain');
   }
 
   if (n === 4) {
-    ['bankName','routingLast4','accountLast4','accountName'].forEach(id => req(id));
-    if (!acctType) {
-      showToast('Please select an account type.', 'err');
-      ok = false;
+    if (!req('bank_name','f_bank_name')) ok = false;
+    // Account type
+    const at = document.querySelector('[name=account_type]:checked');
+    if (!at) {
+      document.getElementById('f_account_type')?.classList.add('invalid');
+      document.getElementById('err_acct_type').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('err_acct_type').style.display = 'none';
     }
-    ['routingLast4','accountLast4'].forEach(id => {
-      const v = document.getElementById(id).value.trim();
-      if (v && !/^\d{4}$/.test(v)) {
-        document.getElementById(id).classList.add('err');
-        ok = false;
-      }
-    });
+    // Routing
+    const rt = document.getElementById('routing_number');
+    if (!rt || rt.value.replace(/\D/g,'').length !== 9) {
+      document.getElementById('f_routing_number')?.classList.add('invalid');
+      document.getElementById('err_routing').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('err_routing').style.display = 'none';
+    }
+    // Account
+    const ac = document.getElementById('account_number');
+    if (!ac || !ac.value.trim()) {
+      document.getElementById('f_account_number')?.classList.add('invalid');
+      document.getElementById('err_acct_num').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('err_acct_num').style.display = 'none';
+    }
+    // Confirm
+    const acc = document.getElementById('account_number_confirm');
+    if (!acc || acc.value !== ac?.value) {
+      document.getElementById('f_account_number_confirm')?.classList.add('invalid');
+      document.getElementById('err_acct_confirm').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('err_acct_confirm').style.display = 'none';
+    }
+    if (!req('name_on_account','f_name_on_account')) ok = false;
   }
 
-  if (!ok && n < 5) showToast('Please fill in all required fields.', 'err');
+  if (n === 5) {
+    if (!req('typed_name','f_typed_name')) ok = false;
+    if (!sigSigned) {
+      document.getElementById('sigCanvas').classList.add('error');
+      document.getElementById('err_sig').style.display = 'block'; ok = false;
+    } else {
+      document.getElementById('sigCanvas').classList.remove('error');
+      document.getElementById('err_sig').style.display = 'none';
+    }
+  }
+
+  if (!ok) {
+    const firstInvalid = document.querySelector('.field.invalid, .patch-error[style*="block"]');
+    if (firstInvalid) firstInvalid.scrollIntoView({ behavior:'smooth', block:'center' });
+  }
   return ok;
 }
 
-// ─── Build review summary on step 5 ─────────────────────────────────────────
-function buildReviewSummary() {
-  const loa = [...document.querySelectorAll('#loaGroup input:checked')].map(c=>c.value).join(', ');
-  document.getElementById('reviewSummary').innerHTML = `
-    <strong style="color:var(--navy);display:block;margin-bottom:8px">📋 Please confirm your information:</strong>
-    <b>Name:</b> ${v('firstName')} ${v('lastName')} &nbsp;·&nbsp;
-    <b>Email:</b> ${v('email')} &nbsp;·&nbsp;
-    <b>Phone:</b> ${v('phone')}<br>
-    <b>License #:</b> ${v('licenseNumber')} &nbsp;·&nbsp;
-    <b>State:</b> ${v('licenseState')} &nbsp;·&nbsp;
-    <b>NPN:</b> ${v('npn')}<br>
-    <b>Lines of Authority:</b> ${loa || '—'}<br>
-    <b>Bank:</b> ${v('bankName')} &nbsp;·&nbsp;
-    <b>Account:</b> ${acctType} ····${v('accountLast4')}
-  `;
-}
-function v(id) { return (document.getElementById(id)?.value || '').trim(); }
-
-// ─── Signature Canvas ─────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+//  SIGNATURE PAD — MOUSE + TOUCH
+// ════════════════════════════════════════════════════════════
 const canvas = document.getElementById('sigCanvas');
 const ctx    = canvas.getContext('2d');
-let painting = false;
-let lastX = 0, lastY = 0;
+let drawing  = false;
+let sigSigned = false;
 
-function resizeCanvas() {
+function resizeSig() {
   const rect = canvas.getBoundingClientRect();
-  canvas.width  = rect.width  * (window.devicePixelRatio || 1);
-  canvas.height = rect.height * (window.devicePixelRatio || 1);
-  ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
-  ctx.strokeStyle = '#1A3A1A';
+  const dpr  = window.devicePixelRatio || 1;
+  const data  = sigSigned ? ctx.getImageData(0, 0, canvas.width, canvas.height) : null;
+  canvas.width  = rect.width  * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  ctx.strokeStyle = '#1A1A1A';
   ctx.lineWidth   = 2.2;
   ctx.lineCap     = 'round';
   ctx.lineJoin    = 'round';
 }
-window.addEventListener('load', resizeCanvas);
-window.addEventListener('resize', resizeCanvas);
+resizeSig();
+window.addEventListener('resize', resizeSig);
 
-function getPos(e) {
-  const rect = canvas.getBoundingClientRect();
-  if (e.touches) {
-    return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+function getXY(e) {
+  const r = canvas.getBoundingClientRect();
+  const src = e.touches ? e.touches[0] : e;
+  return { x: src.clientX - r.left, y: src.clientY - r.top };
+}
+function onDown(e) { e.preventDefault(); drawing = true; const p = getXY(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+function onMove(e) {
+  if (!drawing) return; e.preventDefault();
+  const p = getXY(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+  if (!sigSigned) {
+    sigSigned = true;
+    canvas.classList.add('signed');
+    document.getElementById('sigStatus').textContent = 'Signature drawn ✓';
+    document.getElementById('sigStatus').style.color = '#325838';
+    document.getElementById('err_sig').style.display = 'none';
+    canvas.classList.remove('error');
   }
-  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
 }
+function onUp(e) { e.preventDefault(); drawing = false; ctx.beginPath(); }
 
-canvas.addEventListener('mousedown',  e => { painting=true; const p=getPos(e); lastX=p.x; lastY=p.y; });
-canvas.addEventListener('mousemove',  e => { if(!painting) return; draw(getPos(e)); });
-canvas.addEventListener('mouseup',    () => { painting=false; checkSigDrawn(); });
-canvas.addEventListener('mouseleave', () => { painting=false; });
-canvas.addEventListener('touchstart', e => { e.preventDefault(); painting=true; const p=getPos(e); lastX=p.x; lastY=p.y; });
-canvas.addEventListener('touchmove',  e => { e.preventDefault(); if(!painting) return; draw(getPos(e)); });
-canvas.addEventListener('touchend',   () => { painting=false; checkSigDrawn(); });
-
-function draw(pos) {
-  ctx.beginPath();
-  ctx.moveTo(lastX, lastY);
-  ctx.lineTo(pos.x, pos.y);
-  ctx.stroke();
-  lastX = pos.x;
-  lastY = pos.y;
-}
+canvas.addEventListener('mousedown',  onDown, { passive:false });
+canvas.addEventListener('mousemove',  onMove, { passive:false });
+canvas.addEventListener('mouseup',    onUp,   { passive:false });
+canvas.addEventListener('mouseleave', onUp,   { passive:false });
+canvas.addEventListener('touchstart', onDown, { passive:false });
+canvas.addEventListener('touchmove',  onMove, { passive:false });
+canvas.addEventListener('touchend',   onUp,   { passive:false });
 
 function clearSig() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  sigDrawn = false;
-  document.getElementById('sigStatus').textContent = 'Signature cleared';
-  document.getElementById('sigStatus').style.color = 'var(--text-sec)';
+  sigSigned = false;
+  canvas.classList.remove('signed','error');
+  document.getElementById('sigStatus').textContent = 'Signature not yet drawn';
+  document.getElementById('sigStatus').style.color = '#6B7280';
 }
 
-function checkSigDrawn() {
-  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-  const hasPixels = data.some((v, i) => i % 4 === 3 && v > 0);
-  sigDrawn = hasPixels;
-  const el = document.getElementById('sigStatus');
-  if (hasPixels) {
-    el.textContent = '✅ Signature captured';
-    el.style.color = 'var(--success)';
-  }
-}
+// ════════════════════════════════════════════════════════════
+//  REGULATORY YES/NO TOGGLE
+// ════════════════════════════════════════════════════════════
+document.querySelectorAll('[name=regulatory_action]').forEach(r => {
+  r.addEventListener('change', () => {
+    const v = document.querySelector('[name=regulatory_action]:checked')?.value;
+    document.getElementById('regulatory_explain_wrap').style.display = v === 'Yes' ? 'block' : 'none';
+  });
+});
 
-function syncSigName(val) {
-  // Optional: auto-draw typed name lightly as guide
-}
+// ════════════════════════════════════════════════════════════
+//  ROUTING / ACCOUNT — DIGITS ONLY
+// ════════════════════════════════════════════════════════════
+document.getElementById('routing_number').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g,'');
+  const err = document.getElementById('err_routing');
+  if (err) err.style.display = this.value.length > 0 && this.value.length !== 9 ? 'block' : 'none';
+});
+['account_number','account_number_confirm'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g,'');
+  });
+});
+document.getElementById('account_number_confirm').addEventListener('input', function() {
+  const ac = document.getElementById('account_number').value;
+  const err = document.getElementById('err_acct_confirm');
+  if (err) err.style.display = this.value.length > 0 && this.value !== ac ? 'block' : 'none';
+});
+document.getElementById('ssn_last4').addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g,'');
+});
 
-// ─── SUBMIT ───────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════
+//  SUBMIT
+// ════════════════════════════════════════════════════════════
 async function submitForm() {
-  // Validate signed name
-  const signedName = v('signedName');
-  if (!signedName) {
-    document.getElementById('signedName').classList.add('err');
-    showToast('Please type your full legal name.', 'err');
-    return;
-  }
-  if (!sigDrawn) {
-    showToast('Please draw your signature in the box.', 'err');
-    return;
-  }
+  if (!validateStep(5)) return;
 
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = '⏳ Submitting…';
+  btn.textContent = 'Submitting…';
 
-  // Gather LOA
-  const loa = [...document.querySelectorAll('#loaGroup input:checked')]
-                .map(c => c.value).join(', ');
+  const lines = Array.from(document.querySelectorAll('[name=lines_of_authority]:checked')).map(c => c.value);
+  const states = Array.from(document.querySelectorAll('[name=states_appointed]:checked')).map(c => c.value);
+  const confNum = 'OB365-' + Date.now().toString().slice(-8);
 
-  // Get signature as base64 PNG
-  let signatureData = '';
-  try { signatureData = canvas.toDataURL('image/png'); } catch(e) {}
-
-  // Generate IDs
-  const id                 = genId();
-  const agent_number       = genAgentNumber();
-  const confirmation_number = genConfirmation();
-
-  // Build the complete payload matching onboarding_submissions exactly
   const payload = {
-    id,
-    agent_number,
-    confirmation_number,
-    status:              'pending',
-    source:              'onboarding-form',
-
     // Personal
-    first_name:          v('firstName'),
-    last_name:           v('lastName'),
-    email:               v('email').toLowerCase(),
-    phone:               v('phone'),
-    address:             v('address'),
-    dob:                 v('dob'),
-    ssn_last4:           v('ssnLast4'),
-
+    first_name:    document.getElementById('first_name').value.trim(),
+    last_name:     document.getElementById('last_name').value.trim(),
+    email:         document.getElementById('email').value.trim(),
+    phone:         document.getElementById('phone').value.trim(),
+    address:       document.getElementById('address').value.trim(),
+    date_of_birth: document.getElementById('dob').value,
+    ssn_last4:     document.getElementById('ssn_last4').value.trim(),
     // License
-    license_number:      v('licenseNumber'),
-    license_type:        v('licenseType'),
-    license_state:       v('licenseState'),
-    license_expiry:      v('licenseExpiry'),
-    npn:                 v('npn'),
-    lines_of_authority:  loa,
-    experience:          v('experience') || null,
-
+    license_number: document.getElementById('license_number').value.trim(),
+    license_state:  document.getElementById('license_state').value,
+    license_type:   document.getElementById('license_type').value,
+    license_expiry: document.getElementById('license_expiry').value,
+    npn:            document.getElementById('npn').value.trim(),
+    experience:     document.getElementById('experience').value,
+    lines_of_authority: lines.join(', '),
+    states_appointed:   states.join(', '),
     // Agency
-    referring_broker:    v('referringBroker') || null,
-    eo_carrier:          v('eoCarrier'),
-    regulatory_action:   regAction,
-    regulatory_explain:  regAction === 'yes' ? v('regulatoryExplain') : null,
-
+    referring_agent:        document.getElementById('referring_agent').value.trim(),
+    eo_carrier:             document.getElementById('eo_carrier').value.trim(),
+    eo_policy_number:       document.getElementById('eo_policy_number').value.trim(),
+    eo_expiry:              document.getElementById('eo_expiry').value,
+    regulatory_action:      document.querySelector('[name=regulatory_action]:checked')?.value || '',
+    regulatory_explanation: document.getElementById('regulatory_explanation').value.trim(),
     // Banking
-    bank_name:           v('bankName'),
-    account_type:        acctType,
-    routing_last4:       v('routingLast4'),
-    account_last4:       v('accountLast4'),
-    account_name:        v('accountName'),
-
+    bank_name:       document.getElementById('bank_name').value.trim(),
+    account_type:    document.querySelector('[name=account_type]:checked')?.value || '',
+    routing_number:  document.getElementById('routing_number').value.trim(),
+    account_number:  document.getElementById('account_number').value.trim(),
+    name_on_account: document.getElementById('name_on_account').value.trim(),
     // Signature
-    signed_name:         signedName,
-    sign_date:           new Date().toISOString().split('T')[0],
-    signature_data:      signatureData,
-
-    // Admin (default)
-    admin_notes:         '',
-    // submitted_at and updated_at auto-set by Supabase DEFAULT NOW()
+    typed_name:      document.getElementById('typed_name').value.trim(),
+    signature_data:  canvas.toDataURL('image/png'),
+    // Meta
+    source:          'onboarding-form',
+    status:          'pending',
+    confirmation_number: confNum,
+    submitted_at:    new Date().toISOString(),
   };
 
-  // 1. Save to Supabase
-  let supabaseOk = false;
-  if (sb) {
-    try {
-      const { error } = await sb.from('onboarding_submissions').insert(payload);
-      if (error) {
-        console.error('Supabase error:', error);
-      } else {
-        supabaseOk = true;
-      }
-    } catch(e) {
-      console.error('Supabase exception:', e);
-    }
-  }
-
-  // 2. LocalStorage backup (always)
   try {
-    const stored = JSON.parse(localStorage.getItem('onboarding_backup') || '[]');
-    stored.push({ ...payload, signature_data: '[base64 omitted]' });
-    localStorage.setItem('onboarding_backup', JSON.stringify(stored));
-  } catch(e) {}
-
-  // 3. Send notification email to agency
-  try {
-    const subDate = new Date().toLocaleString('en-US',{
-      year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
-    });
-    const htmlContent = `
-<div style="font-family:Arial,sans-serif;max-width:620px;margin:0 auto;background:#f4f7f4;padding:20px">
-  <div style="background:#1A3A1A;padding:24px 32px;border-radius:12px 12px 0 0;text-align:center">
-    <div style="background:#C9A84C;color:#1A3A1A;font-weight:bold;font-size:20px;
-                width:52px;height:52px;line-height:52px;border-radius:10px;
-                margin:0 auto 12px;font-family:Georgia,serif">365</div>
-    <h1 style="color:#fff;margin:0;font-size:18px;font-family:Georgia,serif">
-      New Agent Application Received
-    </h1>
-    <p style="color:#C9A84C;margin:6px 0 0;font-size:12px">Our 365 Financial Solution LLC</p>
-  </div>
-  <div style="background:#fff;padding:28px 32px;border:1px solid #C8DEC8;
-              border-top:none;border-radius:0 0 12px 12px">
-    <div style="background:#EEF6EE;border:1px solid #C9A84C;border-radius:8px;
-                padding:12px 18px;margin-bottom:20px;text-align:center">
-      <p style="margin:0;color:#1A3A1A;font-weight:700">Status: PENDING REVIEW</p>
-      <p style="margin:4px 0 0;color:#5A6275;font-size:12px">
-        Agent # ${agent_number} · Confirmation: ${confirmation_number}
-      </p>
-    </div>
-    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px">
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275;width:38%"><b>Name</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.first_name} ${payload.last_name}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>Email</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.email}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>Phone</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.phone}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>License #</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.license_number}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>License State</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.license_state}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>NPN</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.npn}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>Lines of Authority</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.lines_of_authority}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>E&O Carrier</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.eo_carrier}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>Referring Broker</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.referring_broker || 'None'}</td>
-      </tr>
-      <tr style="border-bottom:1px solid #E2F0E2">
-        <td style="padding:9px 0;color:#5A6275"><b>Regulatory Action</b></td>
-        <td style="padding:9px 0;color:${payload.regulatory_action==='yes'?'#DC2626':'#15803D'};font-weight:700">
-          ${payload.regulatory_action === 'yes' ? '⚠️ YES — See notes below' : '✅ No'}
-        </td>
-      </tr>
-      <tr>
-        <td style="padding:9px 0;color:#5A6275"><b>Bank</b></td>
-        <td style="padding:9px 0;color:#1A3A1A">${payload.bank_name} · ${payload.account_type} ····${payload.account_last4}</td>
-      </tr>
-    </table>
-    ${payload.regulatory_action === 'yes' ? `
-    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:14px;margin-bottom:16px">
-      <p style="margin:0;font-size:13px;color:#DC2626;font-weight:700">⚠️ Regulatory Explanation:</p>
-      <p style="margin:8px 0 0;font-size:13px;color:#1A1A2E">${payload.regulatory_explain}</p>
-    </div>` : ''}
-    <div style="background:#EEF6EE;border-left:4px solid #C9A84C;border-radius:6px;
-                padding:14px;margin-bottom:16px">
-      <p style="margin:0;font-size:12px;color:#1A3A1A">
-        <b>Submitted:</b> ${subDate}<br>
-        <b>Source:</b> ${payload.source}<br>
-        <b>Supabase saved:</b> ${supabaseOk ? '✅ Yes' : '⚠️ Failed — check backup'}
-      </p>
-    </div>
-    <div style="text-align:center">
-      <a href="https://our365fs.github.io/our365-onboarding/admin.html"
-         style="display:inline-block;background:#1A3A1A;color:#fff;text-decoration:none;
-                padding:12px 28px;border-radius:8px;font-weight:700;font-size:13px">
-        Review in Onboarding Admin →
-      </a>
-    </div>
-    <p style="margin-top:20px;font-size:11px;color:#718096;text-align:center">
-      Automated notification · Our 365 Financial Solution LLC
-    </p>
-  </div>
-</div>`;
-
-    if (typeof emailjs !== 'undefined') {
-      await emailjs.send(EMAILJS_SVC, EMAILJS_TPL, {
-        to_email:           NOTIFY_EMAIL,
-        html_content:       htmlContent,
-        broker_name:        `${payload.first_name} ${payload.last_name}`,
-        confirmation_number: confirmation_number,
-      });
-    }
+    const { error } = await sb.from('onboarding_submissions').insert([payload]);
+    if (error) throw error;
   } catch(e) {
-    console.warn('Email notification failed (non-blocking):', e);
+    console.error('Supabase error:', e);
+    // Continue anyway — show success and email notification
   }
 
-  // 4. Show success
-  document.querySelector('.progress-wrap').style.display = 'none';
+  // Email notification
+  try {
+    const emailPayload = {
+      service_id:  EMAILJS_SERVICE,
+      template_id: EMAILJS_TEMPLATE,
+      user_id:     EMAILJS_KEY,
+      template_params: {
+        to_email:    'onboarding@our365financialsolution.net',
+        agent_name:  payload.first_name + ' ' + payload.last_name,
+        agent_email: payload.email,
+        agent_phone: payload.phone,
+        license_num: payload.license_number,
+        npn:         payload.npn,
+        conf_num:    confNum,
+        subject:     'New Agent Application — ' + payload.first_name + ' ' + payload.last_name,
+      }
+    };
+    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(emailPayload)
+    });
+  } catch(e) { console.warn('EmailJS error:', e); }
+
+  // Show success
+  document.querySelector('.progress-bar').style.display = 'none';
   document.querySelectorAll('.step-panel').forEach(p => p.style.display = 'none');
-  document.getElementById('confirmNumDisplay').textContent = confirmation_number;
-  document.getElementById('confirmEmail').textContent = payload.email;
-  document.getElementById('successScreen').classList.add('show');
+  document.getElementById('confNum').textContent = 'Confirmation #: ' + confNum;
+  document.getElementById('successScreen').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-// ─── Toast helper ─────────────────────────────────────────────────────────────
-function showToast(msg, type = 'ok') {
-  const old = document.querySelector('.toast');
-  if (old) old.remove();
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(() => { if (t.parentNode) t.remove(); }, 3500);
-}
-
-// ─── Set DOB max to today ─────────────────────────────────────────────────────
-document.getElementById('dob').max = new Date().toISOString().split('T')[0];
-<script src="signature_fix.js"></script>
-<script src="onboarding_patch.js"></script>
+</script>
 </body>
 </html>
