@@ -403,7 +403,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#F3F7F4;color:#1A1A1
       <div class="success-icon">✅</div>
       <h2>Application Submitted!</h2>
       <p>Thank you for applying to Our 365 Financial Solution.<br>Your application is under review.</p>
-      <div class="conf-num" id="confNum"></div>
+      <div class="conf-num" id="confNum"></div><div id="successInfo"></div>
       <div class="next-steps">
         <h4>What Happens Next</h4>
         <ul style="list-style:none;padding:0">
@@ -776,34 +776,116 @@ async function submitForm() {
     // Continue anyway — show success and email notification
   }
 
-  // Email notification
+  // Email notification — comprehensive message body
   try {
+    const agentName = payload.first_name + ' ' + payload.last_name;
+    const msgBody = [
+      '=== NEW AGENT APPLICATION RECEIVED ===',
+      'Confirmation #: ' + confNum,
+      'Submitted: ' + new Date().toLocaleString('en-US'),
+      '',
+      '--- PERSONAL INFO ---',
+      'Name: ' + agentName,
+      'Email: ' + payload.email,
+      'Phone: ' + payload.phone,
+      'DOB: ' + payload.date_of_birth,
+      'Address: ' + payload.address,
+      '',
+      '--- LICENSE & CREDENTIALS ---',
+      'License #: ' + payload.license_number,
+      'License State: ' + payload.license_state,
+      'License Type: ' + payload.license_type,
+      'License Expiry: ' + payload.license_expiry,
+      'NPN: ' + payload.npn,
+      'Experience: ' + payload.experience,
+      'Lines of Authority: ' + payload.lines_of_authority,
+      'States Appointed: ' + payload.states_appointed,
+      '',
+      '--- AGENCY & BACKGROUND ---',
+      'Referring Agent: ' + (payload.referring_agent || 'N/A'),
+      'E&O Carrier: ' + payload.eo_carrier,
+      'E&O Policy #: ' + (payload.eo_policy_number || 'N/A'),
+      'Regulatory Action: ' + payload.regulatory_action,
+      payload.regulatory_explanation ? 'Explanation: ' + payload.regulatory_explanation : '',
+      '',
+      '--- BANKING (Direct Deposit) ---',
+      'Bank Name: ' + payload.bank_name,
+      'Account Type: ' + payload.account_type,
+      'Routing #: ' + payload.routing_number,
+      'Account #: ' + payload.account_number,
+      'Name on Account: ' + payload.name_on_account,
+      '',
+      '--- SIGNATURE ---',
+      'Typed Name: ' + payload.typed_name,
+      'Digital Signature: Captured & saved to Supabase',
+      '',
+      '=== ACTION REQUIRED ===',
+      'Log in to admin panel to review and approve:',
+      'https://our365fs.github.io/our365-onboarding/admin.html',
+    ].filter(l => l !== undefined).join('\n');
+
     const emailPayload = {
       service_id:  EMAILJS_SERVICE,
       template_id: EMAILJS_TEMPLATE,
       user_id:     EMAILJS_KEY,
       template_params: {
-        to_email:    'onboarding@our365financialsolution.net',
-        agent_name:  payload.first_name + ' ' + payload.last_name,
+        // Standard EmailJS template variables — covers most template layouts
+        to_name:    'Our 365 Onboarding Team',
+        from_name:  agentName,
+        from_email: payload.email,
+        reply_to:   payload.email,
+        to_email:   'onboarding@our365financialsolution.net',
+        subject:    'New Agent Application — ' + agentName + ' [' + confNum + ']',
+        // Content fields — template uses whichever of these it has
+        message:    msgBody,
+        message_html: msgBody.replace(/\n/g, '<br>').replace(/===/g, '<strong>').replace(/---/g,'<em>'),
+        content:    msgBody,
+        body:       msgBody,
+        // Individual fields as fallback
+        agent_name:  agentName,
         agent_email: payload.email,
         agent_phone: payload.phone,
-        license_num: payload.license_number,
-        npn:         payload.npn,
-        conf_num:    confNum,
-        subject:     'New Agent Application — ' + payload.first_name + ' ' + payload.last_name,
+        license_number: payload.license_number,
+        license_state:  payload.license_state,
+        npn:            payload.npn,
+        lines_of_authority: payload.lines_of_authority,
+        states_appointed:   payload.states_appointed,
+        bank_name:      payload.bank_name,
+        account_type:   payload.account_type,
+        conf_num:       confNum,
       }
     };
-    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(emailPayload)
     });
+    if (!res.ok) console.warn('EmailJS response:', res.status, await res.text());
   } catch(e) { console.warn('EmailJS error:', e); }
 
   // Show success
   document.querySelector('.progress-bar').style.display = 'none';
   document.querySelectorAll('.step-panel').forEach(p => p.style.display = 'none');
   document.getElementById('confNum').textContent = 'Confirmation #: ' + confNum;
+  // Show key submitted info on success screen
+  const infoEl = document.getElementById('successInfo');
+  if (infoEl) {
+    infoEl.innerHTML = [
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.83rem;margin-top:14px">',
+      '<div><span style="color:#6B7280">Name:</span> <strong>' + payload.first_name + ' ' + payload.last_name + '</strong></div>',
+      '<div><span style="color:#6B7280">Email:</span> <strong>' + payload.email + '</strong></div>',
+      '<div><span style="color:#6B7280">License #:</span> <strong>' + payload.license_number + '</strong></div>',
+      '<div><span style="color:#6B7280">NPN:</span> <strong>' + payload.npn + '</strong></div>',
+      '<div><span style="color:#6B7280">States:</span> <strong>' + payload.states_appointed.split(', ').length + ' state(s)</strong></div>',
+      '<div><span style="color:#6B7280">Bank:</span> <strong>' + payload.bank_name + '</strong></div>',
+      '</div>',
+      // Signature preview
+      '<div style="margin-top:16px">',
+      '<div style="font-size:0.8rem;color:#6B7280;margin-bottom:6px;font-weight:600">YOUR SIGNATURE</div>',
+      '<img src="' + canvas.toDataURL('image/png') + '" style="max-width:100%;border:1px solid #E5E7EB;border-radius:8px;background:#fff" alt="Signature">',
+      '</div>'
+    ].join('');
+  }
   document.getElementById('successScreen').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
