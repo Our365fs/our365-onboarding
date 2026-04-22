@@ -263,7 +263,7 @@ tr:hover{background:rgba(200,152,46,0.03)}
 // SUPABASE
 // ═══════════════════════════════════════════════
 const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MTY1MTEsImV4cCI6MjA4OTE5MjUxMX0.e8fqOaSJWBrAElKq30s293k6jpkQI0YhxdqOL6bxuVM';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwMjA4NTgsImV4cCI6MjA1ODU5Njg1OH0.vBsnxVrTblqK-dCNbKQlmmkDHNWMv8Ia3GBQsrBZbIc';
 let sb = null;
 try {
   if (window.supabase && window.supabase.createClient) {
@@ -278,29 +278,44 @@ try {
 function mapDbToApp(row) {
   return {
     id: row.id,
-    agentNumber: row.agent_number || '',
+    agentNumber:        row.agent_number        || '',
     confirmationNumber: row.confirmation_number || '',
-    status: row.status || 'pending',
-    firstName: row.first_name || '',
-    lastName: row.last_name || '',
-    email: row.email || '',
-    phone: row.phone || '',
-    address: row.address || '',
-    dob: row.dob || '',
-    ssn: row.ssn_last4 ? '***-**-' + row.ssn_last4 : '',
-    licenseNumber: row.license_number || '',
-    licenseType: row.license_type || '',
-    licenseExpiry: row.license_expiry || '',
-    npn: row.npn || '',
-    experience: row.experience || '',
-    referringBroker: row.referring_broker || '',
-    eoCarrier: row.eo_carrier || '',
-    regulatoryAction: row.regulatory_action || 'no',
-    signedName: row.signed_name || '',
-    signDate: row.sign_date || '',
-    signatureData: row.signature_data || '',
-    adminNotes: row.admin_notes || '',
-    submittedAt: row.submitted_at || new Date().toISOString(),
+    status:             row.status              || 'pending',
+    firstName:          row.first_name          || '',
+    lastName:           row.last_name           || '',
+    email:              row.email               || '',
+    phone:              row.phone               || '',
+    address:            row.address             || '',
+    // date_of_birth is the new field name (old forms used dob)
+    dob:          row.date_of_birth || row.dob  || '',
+    ssn:          row.ssn_last4 ? '***-**-' + row.ssn_last4 : '',
+    licenseNumber:  row.license_number  || '',
+    licenseState:   row.license_state   || '',
+    licenseType:    row.license_type    || '',
+    licenseExpiry:  row.license_expiry  || '',
+    npn:            row.npn             || '',
+    experience:     row.experience      || '',
+    linesOfAuthority:  row.lines_of_authority  || '',
+    statesAppointed:   row.states_appointed    || '',
+    // referring_agent is new field name (old: referring_broker)
+    referringBroker: row.referring_agent || row.referring_broker || '',
+    eoCarrier:       row.eo_carrier      || '',
+    eoPolicyNumber:  row.eo_policy_number || '',
+    eoExpiry:        row.eo_expiry        || '',
+    regulatoryAction:      row.regulatory_action      || 'No',
+    regulatoryExplanation: row.regulatory_explanation || '',
+    // Banking
+    bankName:       row.bank_name       || '',
+    accountType:    row.account_type    || '',
+    routingNumber:  row.routing_number  || '',
+    accountNumber:  row.account_number  || '',
+    nameOnAccount:  row.name_on_account || '',
+    // Signature
+    signedName:     row.typed_name   || row.signed_name  || '',
+    signDate:       row.submitted_at || row.sign_date    || '',
+    signatureData:  row.signature_data || '',
+    adminNotes:     row.admin_notes    || '',
+    submittedAt:    row.submitted_at   || new Date().toISOString(),
     documents: {},
   };
 }
@@ -441,6 +456,18 @@ if (isLoggedIn) {
 let submissions = [];
 
 async function loadDashboard() {
+  // Quick connection test
+  if (sb) {
+    try {
+      const { error } = await sb.from('onboarding_submissions').select('id').limit(1);
+      if (error) {
+        console.warn('[SUPABASE] Connection test failed:', error.message);
+        showToast('⚠️ Database connection issue: ' + error.message, '#F59E0B');
+      } else {
+        console.log('[SUPABASE] Connection OK');
+      }
+    } catch(e) { console.warn('[SUPABASE] Exception:', e); }
+  }
   submissions = await getAllSubmissions();
   updateStats();
   renderTable();
@@ -556,6 +583,12 @@ async function openDetail(id) {
       <h4>Personal Information</h4>
       <div class="dp-row"><span class="dp-label">Full Name</span><span class="dp-value">${esc(s.firstName)} ${esc(s.lastName)}</span></div>
       <div class="dp-row"><span class="dp-label">Email</span><span class="dp-value">${esc(s.email || '—')}</span></div>
+      ${s.linesOfAuthority ? `<div class="dp-row"><span class="dp-label">Lines of Authority</span><span class="dp-value">${esc(s.linesOfAuthority)}</span></div>` : ''}
+      ${s.statesAppointed  ? `<div class="dp-row"><span class="dp-label">States Appointed</span><span class="dp-value">${esc(s.statesAppointed)}</span></div>` : ''}
+      ${s.bankName         ? `<div class="dp-row"><span class="dp-label">Bank</span><span class="dp-value">${esc(s.bankName)} (${esc(s.accountType || '')})</span></div>` : ''}
+      ${s.routingNumber    ? `<div class="dp-row"><span class="dp-label">Routing #</span><span class="dp-value">${esc(s.routingNumber)}</span></div>` : ''}
+      ${s.accountNumber    ? `<div class="dp-row"><span class="dp-label">Account #</span><span class="dp-value">${esc(s.accountNumber)}</span></div>` : ''}
+      ${s.nameOnAccount    ? `<div class="dp-row"><span class="dp-label">Name on Account</span><span class="dp-value">${esc(s.nameOnAccount)}</span></div>` : ''}
       <div class="dp-row"><span class="dp-label">Phone</span><span class="dp-value">${esc(s.phone || '—')}</span></div>
       <div class="dp-row"><span class="dp-label">Address</span><span class="dp-value">${esc(s.address || '—')}</span></div>
       <div class="dp-row"><span class="dp-label">Date of Birth</span><span class="dp-value">${esc(s.dob || '—')}</span></div>
