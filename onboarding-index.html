@@ -433,9 +433,7 @@ const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwMjA4NTgsImV4cCI6MjA1ODU5Njg1OH0.vBsnxVrTblqK-dCNbKQlmmkDHNWMv8Ia3GBQsrBZbIc';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const EMAILJS_SERVICE  = 'service_95qnnh4';
-const EMAILJS_TEMPLATE = 'template_mnb46qe';
-const EMAILJS_KEY      = 'ESj_ZXJOCKi-is5Ya';
+const EMAIL_HANDLER = 'https://our365financialsolution.net/send_onboarding.php';
 
 // ════════════════════════════════════════════════════════════
 //  STATES
@@ -811,29 +809,16 @@ async function submitForm() {
     console.error('[Supabase] Exception:', e.message || e);
   }
 
-  // Email notification
+  // Send via GoDaddy PHP mailer — no EmailJS, no limits, no template issues
   try {
-    const emailPayload = {
-      service_id:  EMAILJS_SERVICE,
-      template_id: EMAILJS_TEMPLATE,
-      user_id:     EMAILJS_KEY,
-      template_params: {
-        to_email:    'onboarding@our365financialsolution.net',
-        agent_name:  payload.first_name + ' ' + payload.last_name,
-        agent_email: payload.email,
-        agent_phone: payload.phone,
-        license_num: payload.license_number,
-        npn:         payload.npn,
-        conf_num:    confNum,
-        subject:     'New Agent Application — ' + payload.first_name + ' ' + payload.last_name,
-      }
-    };
-    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    const emailRes = await fetch(EMAIL_HANDLER, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(emailPayload)
+      body: JSON.stringify({ ...payload, confirmation_number: confNum })
     });
-  } catch(e) { console.warn('EmailJS error:', e); }
+    const emailData = await emailRes.json().catch(() => ({}));
+    console.log('[Email]', emailData.success ? 'Sent OK' : 'Failed: ' + emailData.message);
+  } catch(e) { console.warn('[Email] Error:', e.message); }
 
   // Show success
   document.querySelector('.progress-bar').style.display = 'none';
