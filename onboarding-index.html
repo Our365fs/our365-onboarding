@@ -811,28 +811,92 @@ async function submitForm() {
     console.error('[Supabase] Exception:', e.message || e);
   }
 
-  // Email notification
+  // Single email to agency — includes agent-facing confirmation text at bottom
+  // One send = one EmailJS credit per submission
   try {
-    const emailPayload = {
-      service_id:  EMAILJS_SERVICE,
-      template_id: EMAILJS_TEMPLATE,
-      user_id:     EMAILJS_KEY,
-      template_params: {
-        to_email:    'onboarding@our365financialsolution.net',
-        agent_name:  payload.first_name + ' ' + payload.last_name,
-        agent_email: payload.email,
-        agent_phone: payload.phone,
-        license_num: payload.license_number,
-        npn:         payload.npn,
-        conf_num:    confNum,
-        subject:     'New Agent Application — ' + payload.first_name + ' ' + payload.last_name,
-      }
-    };
+    const agentName = payload.first_name + ' ' + payload.last_name;
+    const msgBody = [
+      '╔══════════════════════════════════════════╗',
+      '  NEW AGENT APPLICATION — ACTION REQUIRED',
+      '╚══════════════════════════════════════════╝',
+      'Confirmation #: ' + confNum,
+      'Submitted: ' + new Date().toLocaleString('en-US'),
+      '',
+      '── PERSONAL ─────────────────────────────────',
+      'Name:    ' + agentName,
+      'Email:   ' + payload.email,
+      'Phone:   ' + payload.phone,
+      'DOB:     ' + (payload.date_of_birth || '—'),
+      'Address: ' + (payload.address || '—'),
+      '',
+      '── LICENSE & CREDENTIALS ────────────────────',
+      'License #:  ' + payload.license_number + '  (' + payload.license_state + ')',
+      'Type:       ' + payload.license_type,
+      'Expiry:     ' + payload.license_expiry,
+      'NPN:        ' + payload.npn,
+      'Experience: ' + (payload.experience || '—'),
+      'Lines:      ' + (payload.lines_of_authority || '—'),
+      'States:     ' + (payload.states_appointed || '—'),
+      '',
+      '── AGENCY & BACKGROUND ──────────────────────',
+      'Referring Agent: ' + (payload.referring_agent || 'None'),
+      'E&O Carrier:     ' + (payload.eo_carrier || '—'),
+      'E&O Policy #:    ' + (payload.eo_policy_number || '—'),
+      'Regulatory:      ' + (payload.regulatory_action || '—'),
+      payload.regulatory_explanation ? 'Explanation: ' + payload.regulatory_explanation : '',
+      '',
+      '── BANKING (Direct Deposit) ─────────────────',
+      'Bank:        ' + (payload.bank_name || '—'),
+      'Acct Type:   ' + (payload.account_type || '—'),
+      'Routing #:   ' + (payload.routing_number || '—'),
+      'Account #:   ' + (payload.account_number || '—'),
+      'Name on Acct:' + (payload.name_on_account || '—'),
+      '',
+      '── SIGNATURE ────────────────────────────────',
+      'Typed Name: ' + (payload.typed_name || '—'),
+      'Digital signature captured and saved to admin panel.',
+      '',
+      '══════════════════════════════════════════════',
+      '  REVIEW & APPROVE: https://our365fs.github.io/our365-onboarding/admin.html',
+      '══════════════════════════════════════════════',
+      '',
+      '────────────────────────────────────────────',
+      'FORWARD THIS SECTION TO THE AGENT:',
+      '────────────────────────────────────────────',
+      'Dear ' + payload.first_name + ',',
+      '',
+      'Thank you for applying to Our 365 Financial Solution LLC!',
+      'We have received your application and will review it within 1-2 business days.',
+      '',
+      'Confirmation #: ' + confNum,
+      '',
+      'Once approved, you will receive your portal login credentials by email.',
+      'Questions? Call (844) 687-3653 or email onboarding@our365financialsolution.net',
+      '',
+      'Warm regards,',
+      'Emmanuelle Cador | Agency Principal',
+      'Our 365 Financial Solution LLC',
+    ].filter(l => l !== undefined).join('
+');
+
     await fetch('https://api.emailjs.com/api/v1.0/email/send', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(emailPayload)
+      body: JSON.stringify({
+        service_id:  EMAILJS_SERVICE,
+        template_id: EMAILJS_TEMPLATE,
+        user_id:     EMAILJS_KEY,
+        template_params: {
+          from_name: agentName,
+          reply_to:  payload.email,
+          to_email:  'onboarding@our365financialsolution.net',
+          message:   msgBody,
+          name:      agentName,
+          email:     payload.email,
+        }
+      })
     });
+    console.log('[EmailJS] Notification sent (1 credit used)');
   } catch(e) { console.warn('EmailJS error:', e); }
 
   // Show success
