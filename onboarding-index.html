@@ -433,7 +433,7 @@ const SUPABASE_URL = 'https://ezcyhxvloltdtbuwltry.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6Y3loeHZsb2x0ZHRidXdsdHJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDMwMjA4NTgsImV4cCI6MjA1ODU5Njg1OH0.vBsnxVrTblqK-dCNbKQlmmkDHNWMv8Ia3GBQsrBZbIc';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const WEB3FORMS_KEY = 'YOUR_ACCESS_KEY_HERE'; // get free key at web3forms.com
+// Email via Formsubmit.co — no setup, no keys, no templates
 
 // ════════════════════════════════════════════════════════════
 //  STATES
@@ -809,60 +809,59 @@ async function submitForm() {
     console.error('[Supabase] Exception:', e.message || e);
   }
 
-  // Send via Web3Forms (free, no config, works from any domain)
+  // Send via Formsubmit.co — no API key, no account, no templates
+  // First submission triggers a one-time verification email — just click Activate
   try {
     const agentName = payload.first_name + ' ' + payload.last_name;
-    const bodyLines = [
+    const lines = [
       'CONFIRMATION #: ' + confNum,
-      '=============================================',
       '',
       'NAME:     ' + agentName,
-      'EMAIL:    ' + (payload.email || '-'),
-      'PHONE:    ' + (payload.phone || '-'),
+      'EMAIL:    ' + (payload.email       || '-'),
+      'PHONE:    ' + (payload.phone       || '-'),
       'DOB:      ' + (payload.date_of_birth || '-'),
-      'ADDRESS:  ' + (payload.address || '-'),
+      'ADDRESS:  ' + (payload.address     || '-'),
       '',
       '--- LICENSE ---',
-      'LICENSE #:   ' + (payload.license_number || '-') + ' (' + (payload.license_state || '-') + ')',
-      'TYPE:        ' + (payload.license_type || '-'),
-      'EXPIRY:      ' + (payload.license_expiry || '-'),
-      'NPN:         ' + (payload.npn || '-'),
-      'EXPERIENCE:  ' + (payload.experience || '-'),
-      'LINES:       ' + (payload.lines_of_authority || '-'),
-      'STATES:      ' + (payload.states_appointed || '-'),
+      'LICENSE:  ' + (payload.license_number || '-') + ' | ' + (payload.license_state || '-'),
+      'TYPE:     ' + (payload.license_type   || '-'),
+      'EXPIRY:   ' + (payload.license_expiry || '-'),
+      'NPN:      ' + (payload.npn            || '-'),
+      'LINES:    ' + (payload.lines_of_authority || '-'),
+      'STATES:   ' + (payload.states_appointed   || '-'),
       '',
       '--- AGENCY ---',
-      'REFERRING:   ' + (payload.referring_agent || 'None'),
-      'E&O CARRIER: ' + (payload.eo_carrier || '-'),
-      'REGULATORY:  ' + (payload.regulatory_action || '-'),
-      payload.regulatory_explanation ? 'EXPLANATION: ' + payload.regulatory_explanation : '',
+      'REFERRING: ' + (payload.referring_agent || 'None'),
+      'E&O:       ' + (payload.eo_carrier      || '-'),
+      'REGULATORY:' + (payload.regulatory_action || '-'),
+      (payload.regulatory_explanation ? 'EXPLANATION: ' + payload.regulatory_explanation : ''),
       '',
       '--- BANKING ---',
-      'BANK:        ' + (payload.bank_name || '-'),
-      'ACCT TYPE:   ' + (payload.account_type || '-'),
-      'ROUTING #:   ' + (payload.routing_number || '-'),
-      'ACCOUNT #:   ' + (payload.account_number || '-'),
-      'NAME ON ACCT:' + (payload.name_on_account || '-'),
+      'BANK:     ' + (payload.bank_name    || '-') + ' | ' + (payload.account_type || '-'),
+      'ROUTING:  ' + (payload.routing_number || '-'),
+      'ACCOUNT:  ' + (payload.account_number || '-'),
+      'NAME:     ' + (payload.name_on_account || '-'),
       '',
       '--- SIGNATURE ---',
-      'TYPED NAME:  ' + (payload.typed_name || '-'),
+      'SIGNED:   ' + (payload.typed_name || '-'),
       '',
-      'Admin panel: https://our365fs.github.io/our365-onboarding/admin.html',
+      'APPROVE: https://our365fs.github.io/our365-onboarding/admin.html',
     ].filter(Boolean).join('\n');
 
-    const w3res = await fetch('https://api.web3forms.com/submit', {
+    const fmRes = await fetch('https://formsubmit.co/ajax/onboarding@our365financialsolution.net', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        access_key:   WEB3FORMS_KEY,
-        subject:      'New Agent Application: ' + agentName + ' [' + confNum + ']',
-        from_name:    'Our 365 Onboarding',
-        replyto:      payload.email,
-        message:      bodyLines,
+        _subject:  'New Agent Application: ' + agentName + ' [' + confNum + ']',
+        _replyto:   payload.email,
+        _template: 'table',
+        name:       agentName,
+        email:      payload.email,
+        message:    lines,
       })
     });
-    const w3data = await w3res.json();
-    console.log('[Web3Forms]', w3data.success ? 'Email sent!' : 'Failed: ' + w3data.message);
+    const fmData = await fmRes.json().catch(() => ({}));
+    console.log('[Formsubmit]', fmData.success === 'true' ? 'Email sent!' : JSON.stringify(fmData));
   } catch(e) { console.warn('[Email] Error:', e.message); }
 
   // Show success
