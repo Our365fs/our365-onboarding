@@ -187,6 +187,7 @@ tr:hover{background:rgba(200,152,46,0.03)}
     </div>
     <div class="header-right">
       <div class="admin-badge">Emmanuelle Cador</div>
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-left:8px">v2.1 — Apr 22 2026</div>
       <button class="btn-logout" onclick="doLogout()">Sign Out</button>
     </div>
   </div>
@@ -323,29 +324,53 @@ function mapDbToApp(row) {
 // ═══════════════════════════════════════════════
 // DATABASE (IndexedDB fallback)
 // ═══════════════════════════════════════════════
-const DB_NAME = 'Our365Onboarding';
-const DB_VERSION = 1;
-const STORE = 'submissions';
-
-function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onupgradeneeded = e => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains(STORE)) {
-        const store = db.createObjectStore(STORE, { keyPath: 'id' });
-        store.createIndex('status', 'status', { unique: false });
-        store.createIndex('submittedAt', 'submittedAt', { unique: false });
-      }
-    };
-    req.onsuccess = e => resolve(e.target.result);
-    req.onerror = e => reject(e.target.error);
-  });
-}
+// Wipe old IndexedDB demo data from prior versions
+(function clearOldDemoDB() {
+  try {
+    indexedDB.deleteDatabase('Our365Onboarding');
+    console.log('[DB] Cleared old IndexedDB demo data');
+  } catch(e) {}
+})();
 
 async function getAllSubmissions() {
-  // Always try Supabase — remove demo fallback noise
   document.getElementById('demoWarning') && (document.getElementById('demoWarning').style.display = 'none');
+
+  // Try raw REST API first — bypasses JS client RLS quirks
+  try {
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/onboarding_submissions?select=*&order=submitted_at.desc',
+      {
+        headers: {
+          'apikey':        SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Content-Type':  'application/json',
+          'Prefer':        'return=representation'
+        }
+      }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      console.log('[REST] Loaded', data.length, 'submissions');
+      if (data.length > 0) return data.map(mapDbToApp);
+      // Connected but empty — could be RLS blocking or genuinely empty
+      // Try to detect RLS issue
+      const testRes = await fetch(
+        SUPABASE_URL + '/rest/v1/onboarding_submissions?select=count',
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      );
+      console.log('[REST] Status:', testRes.status);
+      // 200 = connected, data just empty or RLS blocking rows
+      // Show either empty state or setup message
+      if (testRes.status === 200) {
+        document.getElementById('dbSetupMsg') && (document.getElementById('dbSetupMsg').style.display = 'none');
+        document.getElementById('emptyState') && (document.getElementById('emptyState').style.display = 'block');
+        return [];
+      }
+    }
+    console.warn('[REST] HTTP', res.status, await res.text());
+  } catch(e) { console.warn('[REST] Failed:', e.message); }
+
+  // JS client fallback
   if (sb) {
     try {
       const { data, error } = await sb
@@ -353,35 +378,29 @@ async function getAllSubmissions() {
         .select('*')
         .order('submitted_at', { ascending: false });
       if (!error && data) {
-        console.log('[SUPABASE] Loaded', data.length, 'submissions');
+        console.log('[JS] Loaded', data.length, 'submissions');
         return data.map(mapDbToApp);
       }
-      console.warn('[SUPABASE] Query error:', error);
-    } catch (e) { console.warn('[SUPABASE] Failed:', e); }
+      console.warn('[JS] Error:', error?.message);
+    } catch(e) { console.warn('[JS] Failed:', e.message); }
   }
-  // Supabase failed — show clear setup message, return empty list
+
   showDbSetupMessage();
   return [];
 }
 
 async function getSubmission(id) {
-  if (sb) {
-    try {
-      const { data, error } = await sb
-        .from('onboarding_submissions')
-        .select('*')
-        .eq('id', id)
-        .single();
-      if (!error && data) return mapDbToApp(data);
-    } catch (e) { console.warn('[SUPABASE] Get failed:', e); }
-  }
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readonly');
-    const req = tx.objectStore(STORE).get(id);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  try {
+    const res = await fetch(
+      SUPABASE_URL + '/rest/v1/onboarding_submissions?id=eq.' + id + '&select=*',
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+    );
+    if (res.ok) {
+      const rows = await res.json();
+      if (rows && rows[0]) return mapDbToApp(rows[0]);
+    }
+  } catch(e) { console.warn('[REST] getSubmission failed:', e.message); }
+  return null;
 }
 
 async function updateSubmission(data) {
