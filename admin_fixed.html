@@ -359,18 +359,9 @@ async function getAllSubmissions() {
       console.warn('[SUPABASE] Query error:', error);
     } catch (e) { console.warn('[SUPABASE] Failed:', e); }
   }
-  // Fallback — show demo warning banner
-  const wb = document.getElementById('demoWarning');
-  if (wb) wb.style.display = 'flex';
-  // Fallback to IndexedDB
-  const db = await openDB();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readonly');
-    const store = tx.objectStore(STORE);
-    const req = store.getAll();
-    req.onsuccess = () => resolve(req.result.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt)));
-    req.onerror = () => reject(req.error);
-  });
+  // Supabase failed — show clear setup message, return empty list
+  showDbSetupMessage();
+  return [];
 }
 
 async function getSubmission(id) {
@@ -455,18 +446,31 @@ if (isLoggedIn) {
 // ═══════════════════════════════════════════════
 let submissions = [];
 
+function showDbSetupMessage() {
+  const el = document.getElementById('dbSetupMsg');
+  if (el) el.style.display = 'block';
+  const tb = document.getElementById('tableBody');
+  if (tb) tb.innerHTML = '';
+  const ps = document.getElementById('pendingStats');
+  if (ps) ps.textContent = '0';
+}
+
 async function loadDashboard() {
   // Quick connection test
   if (sb) {
     try {
       const { error } = await sb.from('onboarding_submissions').select('id').limit(1);
       if (error) {
-        console.warn('[SUPABASE] Connection test failed:', error.message);
-        showToast('⚠️ Database connection issue: ' + error.message, '#F59E0B');
-      } else {
-        console.log('[SUPABASE] Connection OK');
+        console.warn('[SUPABASE] Error:', error.message);
+        showDbSetupMessage();
+        return; // stop — show setup message instead of empty dashboard
       }
-    } catch(e) { console.warn('[SUPABASE] Exception:', e); }
+      console.log('[SUPABASE] Connected OK');
+    } catch(e) {
+      console.warn('[SUPABASE] Exception:', e);
+      showDbSetupMessage();
+      return;
+    }
   }
   submissions = await getAllSubmissions();
   updateStats();
