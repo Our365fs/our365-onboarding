@@ -809,60 +809,17 @@ async function submitForm() {
     console.error('[Supabase] Exception:', e.message || e);
   }
 
-  // Send via Formsubmit.co — no API key, no account, no templates
-  // First submission triggers a one-time verification email — just click Activate
+  // Save to GoDaddy + send email via PHP (same server, no CORS issues)
   try {
     const agentName = payload.first_name + ' ' + payload.last_name;
-    const lines = [
-      'CONFIRMATION #: ' + confNum,
-      '',
-      'NAME:     ' + agentName,
-      'EMAIL:    ' + (payload.email       || '-'),
-      'PHONE:    ' + (payload.phone       || '-'),
-      'DOB:      ' + (payload.date_of_birth || '-'),
-      'ADDRESS:  ' + (payload.address     || '-'),
-      '',
-      '--- LICENSE ---',
-      'LICENSE:  ' + (payload.license_number || '-') + ' | ' + (payload.license_state || '-'),
-      'TYPE:     ' + (payload.license_type   || '-'),
-      'EXPIRY:   ' + (payload.license_expiry || '-'),
-      'NPN:      ' + (payload.npn            || '-'),
-      'LINES:    ' + (payload.lines_of_authority || '-'),
-      'STATES:   ' + (payload.states_appointed   || '-'),
-      '',
-      '--- AGENCY ---',
-      'REFERRING: ' + (payload.referring_agent || 'None'),
-      'E&O:       ' + (payload.eo_carrier      || '-'),
-      'REGULATORY:' + (payload.regulatory_action || '-'),
-      (payload.regulatory_explanation ? 'EXPLANATION: ' + payload.regulatory_explanation : ''),
-      '',
-      '--- BANKING ---',
-      'BANK:     ' + (payload.bank_name    || '-') + ' | ' + (payload.account_type || '-'),
-      'ROUTING:  ' + (payload.routing_number || '-'),
-      'ACCOUNT:  ' + (payload.account_number || '-'),
-      'NAME:     ' + (payload.name_on_account || '-'),
-      '',
-      '--- SIGNATURE ---',
-      'SIGNED:   ' + (payload.typed_name || '-'),
-      '',
-      'APPROVE: https://our365fs.github.io/our365-onboarding/admin.html',
-    ].filter(Boolean).join('\n');
-
-    const fmRes = await fetch('https://formsubmit.co/ajax/onboarding@our365financialsolution.net', {
+    const saveRes = await fetch('https://our365financialsolution.net/onboarding_save.php', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        _subject:  'New Agent Application: ' + agentName + ' [' + confNum + ']',
-        _replyto:   payload.email,
-        _template: 'table',
-        name:       agentName,
-        email:      payload.email,
-        message:    lines,
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...payload, confirmation_number: confNum })
     });
-    const fmData = await fmRes.json().catch(() => ({}));
-    console.log('[Formsubmit]', fmData.success === 'true' ? 'Email sent!' : JSON.stringify(fmData));
-  } catch(e) { console.warn('[Email] Error:', e.message); }
+    const saveData = await saveRes.json().catch(() => ({}));
+    console.log('[Save]', saveData.ok ? 'Saved + email sent' : 'Issue: ' + JSON.stringify(saveData));
+  } catch(e) { console.warn('[Save] Error:', e.message); }
 
   // Show success
   document.querySelector('.progress-bar').style.display = 'none';
