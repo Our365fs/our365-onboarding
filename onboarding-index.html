@@ -809,17 +809,55 @@ async function submitForm() {
     console.error('[Supabase] Exception:', e.message || e);
   }
 
-  // Save to GoDaddy + send email via PHP (same server, no CORS issues)
+  // Step 1: Save data to GoDaddy PHP (data storage)
   try {
-    const agentName = payload.first_name + ' ' + payload.last_name;
     const saveRes = await fetch('https://our365financialsolution.net/onboarding_save.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...payload, confirmation_number: confNum })
     });
     const saveData = await saveRes.json().catch(() => ({}));
-    console.log('[Save]', saveData.ok ? 'Saved + email sent' : 'Issue: ' + JSON.stringify(saveData));
-  } catch(e) { console.warn('[Save] Error:', e.message); }
+    console.log('[Save]', saveData.ok ? 'Data saved OK' : 'Save issue: ' + JSON.stringify(saveData));
+  } catch(e) { console.warn('[Save]', e.message); }
+
+  // Step 2: Send email via Formsubmit.co (proven to work)
+  try {
+    const agentName = payload.first_name + ' ' + payload.last_name;
+    const msg = 'CONFIRMATION: ' + confNum + '\n\n'
+      + 'NAME: '     + agentName + '\n'
+      + 'EMAIL: '    + (payload.email || '-') + '\n'
+      + 'PHONE: '    + (payload.phone || '-') + '\n'
+      + 'DOB: '      + (payload.date_of_birth || '-') + '\n'
+      + 'ADDRESS: '  + (payload.address || '-') + '\n\n'
+      + 'LICENSE: '  + (payload.license_number||'-') + ' | ' + (payload.license_state||'-') + '\n'
+      + 'TYPE: '     + (payload.license_type || '-') + '\n'
+      + 'EXPIRY: '   + (payload.license_expiry || '-') + '\n'
+      + 'NPN: '      + (payload.npn || '-') + '\n'
+      + 'LINES: '    + (payload.lines_of_authority || '-') + '\n'
+      + 'STATES: '   + (payload.states_appointed || '-') + '\n\n'
+      + 'E&O: '      + (payload.eo_carrier || '-') + '\n'
+      + 'REGULATORY: '+ (payload.regulatory_action || '-') + '\n\n'
+      + 'BANK: '     + (payload.bank_name||'-') + ' | ' + (payload.account_type||'-') + '\n'
+      + 'ROUTING: '  + (payload.routing_number || '-') + '\n'
+      + 'ACCOUNT: '  + (payload.account_number || '-') + '\n'
+      + 'NAME ON ACCOUNT: ' + (payload.name_on_account || '-') + '\n\n'
+      + 'SIGNED: '   + (payload.typed_name || '-') + '\n\n'
+      + 'ADMIN: https://our365financialsolution.net/onboarding_admin.php';
+
+    await fetch('https://formsubmit.co/ajax/onboarding@our365financialsolution.net', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject:  'New Agent Application: ' + agentName + ' [' + confNum + ']',
+        _replyto:   payload.email || '',
+        _template: 'table',
+        name:       agentName,
+        email:      payload.email || '',
+        message:    msg
+      })
+    });
+    console.log('[Email] Formsubmit sent');
+  } catch(e) { console.warn('[Email]', e.message); }
 
   // Show success
   document.querySelector('.progress-bar').style.display = 'none';
