@@ -850,24 +850,10 @@ async function submitForm() {
       body: JSON.stringify({
         _subject:  'New Agent Application: ' + agentName + ' [' + confNum + ']',
         _replyto:   payload.email || '',
-        _cc:        payload.email || '',
         _template: 'table',
         name:       agentName,
         email:      payload.email || '',
-        message:    msg + '\n\n'
-          + '─────────────────────────────────\n'
-          + 'Dear ' + payload.first_name + ',\n\n'
-          + 'Thank you for applying to Our 365 Financial Solution LLC!\n'
-          + 'Your application has been received and is under review.\n\n'
-          + 'CONFIRMATION #: ' + confNum + '\n\n'
-          + 'What happens next:\n'
-          + '1. Our team reviews your application (1-2 business days)\n'
-          + '2. You will receive a welcome email with your portal login\n'
-          + '3. Log in, set your password, complete carrier contracting\n\n'
-          + 'Questions? Call (844) 687-3653\n'
-          + 'or email onboarding@our365financialsolution.net\n\n'
-          + 'Emmanuelle Cador | Agency Principal\n'
-          + 'Our 365 Financial Solution LLC'
+        message:    msg
       })
     });
     console.log('[Email] Formsubmit sent');
